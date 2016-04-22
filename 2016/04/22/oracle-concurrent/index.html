@@ -1,0 +1,827 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Oracle,Oracle DBA,Oracle 并行," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="SQL 语句缺省是在一个 CPU上串行（Serial）执行的，即便系统中有多个 CPU存在，一个 SQL 语句也无法利用它们。这样一来一个 CPU 所能使用的资源就决定了 SQL 语句的性能。这 时提升性能的另一种方法就应运而生，也就是并行处理——同时利用多个 CPU进行工作。
+正统的理论界认为，企业的数据库有两种类型，OLTP 和 OLAP，前者用于业务处理，其 特点是大量的运行时间很短的事务型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Oracle 并行操作">
+<meta property="og:url" content="http://yoursite.com/2016/04/22/oracle-concurrent/index.html">
+<meta property="og:site_name" content="苏南生的博客">
+<meta property="og:description" content="SQL 语句缺省是在一个 CPU上串行（Serial）执行的，即便系统中有多个 CPU存在，一个 SQL 语句也无法利用它们。这样一来一个 CPU 所能使用的资源就决定了 SQL 语句的性能。这 时提升性能的另一种方法就应运而生，也就是并行处理——同时利用多个 CPU进行工作。
+正统的理论界认为，企业的数据库有两种类型，OLTP 和 OLAP，前者用于业务处理，其 特点是大量的运行时间很短的事务型">
+<meta property="og:updated_time" content="2016-04-22T04:20:53.304Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Oracle 并行操作">
+<meta name="twitter:description" content="SQL 语句缺省是在一个 CPU上串行（Serial）执行的，即便系统中有多个 CPU存在，一个 SQL 语句也无法利用它们。这样一来一个 CPU 所能使用的资源就决定了 SQL 语句的性能。这 时提升性能的另一种方法就应运而生，也就是并行处理——同时利用多个 CPU进行工作。
+正统的理论界认为，企业的数据库有两种类型，OLTP 和 OLAP，前者用于业务处理，其 特点是大量的运行时间很短的事务型">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> Oracle 并行操作 | 苏南生的博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">苏南生'S NOTE</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Oracle EBS Technology</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Oracle 并行操作
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-22T11:52:18+08:00" content="2016-04-22">
+              2016-04-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Oracle/" itemprop="url" rel="index">
+                    <span itemprop="name">Oracle</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Oracle/Oracle-DBA/" itemprop="url" rel="index">
+                    <span itemprop="name">Oracle DBA</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/22/oracle-concurrent/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/22/oracle-concurrent/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2016/04/22/oracle-concurrent/" class="leancloud_visitors" data-flag-title="Oracle 并行操作">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>SQL 语句缺省是在一个 CPU上串行（Serial）执行的，即便系统中有多个 CPU存在，一个 SQL 语句也无法利用它们。这样一来一个 CPU 所能使用的资源就决定了 SQL 语句的性能。这 时提升性能的另一种方法就应运而生，也就是并行处理——同时利用多个 CPU进行工作。</p>
+<p>正统的理论界认为，企业的数据库有两种类型，OLTP 和 OLAP，前者用于业务处理，其 特点是大量的运行时间很短的事务型 SQL 语句，并行操作在这种系统中作用有限。后一种用于 数据分析，其特点是大量的查询型 SQL 语句，这里才是并行操作大展身手的舞台。但在实际的 企业环境中，由于成本的制约，可能无法部署一台单独的 OLAP 数据仓库。功能界限的也就无 法绝对切割，很多 7×24 的业务数据库也要支持数据统计分析功能，虽然理论上这些功能应该 是在一个独立的数据仓库中完成。因此无论对于数据仓库还是 OLTP 系统，并行处理是一个非 常有用的工具。 </p>
+<h1 id="并行架构"><a href="#并行架构" class="headerlink" title="并行架构"></a>并行架构</h1><p>Oracle 的并行处理是从 1996 年的 Oracle 7.3 版本开始出现的，随着 Oracle 数据库的发展， 这个功能也不断得到发展和提升。习惯上用户都觉得似乎只有数据仓库才能从并行能力中获益， 其实这中理解并不全面。Oracle 的并行处理并不局限于查询功能（SELECT），DML 操作 （INSERT、UPDATE、DELETE）、DDL 操作（CREATE TABLE、CREATE INDEX），收集统计 数据、加载数据、备份恢复等功能都已经获得了并行支持。因为并行处理可以充分利用多个硬 件资源，利用率越高，处理得效率也会更高。有了并行处理后，TB 级的数据可以在几十分钟 内完成，而不必等待一天或更长的时间，但是处理能力的提升并不是线形关系，如图 7-1 所示， 这是因为数据库处理涉及多个部件，包括 CPU、内存、磁盘 IO，这些部件如果不能同步地扩展， 那么总的性能提升能力会受限于最弱的一环，也就是短板理论。</p>
+<a id="more"></a>
+<p>Oracle 所谓的并行操作通过把一个任务分解成许多小的、独立的部分，使得原来只能由一 个进程完成的一个大任务变成了可以由多个进程同时完成的若干个小任务，这样就能充分利用 系统资源包括多 CPU、多 IO 通道。可以用一个现实生活中的例子来解释什么是并行处理：计 算一条街道上有多少辆汽车，如果让你一个人完成这个任务，那你就需要从街头走到街尾才能 数清楚有多少辆车。如果有两个人一起完成这个任务，那就可以一个人从街头走向街尾、另一 个人从街尾走向街头，如果两个人的能力一样，理论上只需要原来的一半时间就可以完成这个 任务。</p>
+<blockquote>
+<p>注意：只有Oracle企业版才支持并行处理。 </p>
+</blockquote>
+<p>Oracle 的并行架构涉及进程、内存和参数，下面将分别详细介绍。</p>
+<h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>并行操作会用到两类进程，分别叫做 Slave Process 和 Query Coodinator。前者是由若干个 进程组成，这些进程的地位相同，每个进程都负责一部分工作或者一个工作单元。比如全表扫 描，每个 Slave Process负责扫描 Segment 的一部分，这样的一组进程也叫做一个 PS Set（Parallel Server Set）。</p>
+<p>Query Coodinator进程通常是发出 SQL 语句的那个进程，这个进程负责把一个任务分解成 若干个任务片，并申请 PS Set，为每个 Slave Process 指定工作片段，并收集每个 Slave Process 返回的处理结果并汇总成最终的结果返回给用户。总的来说可以这样理解两种进程的角色， Slave Process是真正干活的进程，而 Query Coordinator进程只是指手画脚，负责协调，当然偶 尔也会干活。 </p>
+<p>在并行架构中，Query Coornidator进程会把整个工作会按照一定粒度（Granules）划分成若 干个单元，每个 Slave Process 会分配一个工作单元，Slave Process 完成分配给它的单元后，如 果还有剩余的工作单元，则继续分配下一个单元，直到所有单元都完成。 Query Coornidator进程划分工作单元的粒度有两种。 </p>
+<ul>
+<li><strong>分区：如果对象是分区的，则工作单元可以以分区为单位进行划分。 </strong></li>
+<li><strong>数据块范围：每个工作单位是一个 Segment 中的若干个数据块。 </strong></li>
+</ul>
+<blockquote>
+<p>注意：对于工作单元的划分是在语句的执行期间进行的，而不是在Parsing阶段进行。 </p>
+</blockquote>
+<h2 id="相关参数"><a href="#相关参数" class="headerlink" title="相关参数"></a>相关参数</h2><p>Oracle 数据库中与并行有关的参数有多个，并且随着版本的不同这些参数变化也很大，读 者可以用 SHOW PARAMETER 命令查看这些参数，比如，以下是 Oracle 10.2.0.1 中的查询结果： </p>
+<pre><code>SQL&gt; show parameter parallel 
+NAME     TYPE     VALUE 
+fast_start_parallel_rollback     string     LOW 
+parallel_adaptive_multi_user     boolean     TRUE 
+parallel_automatic_tuning     boolean     FALSE 
+parallel_execution_message_size     integer     2152 
+parallel_instance_group     string 
+parallel_max_servers         integer     160 
+parallel_min_percent         integer     0 
+parallel_min_servers         integer     0 
+parallel_server boolean     FALSE 
+parallel_server_instances         integer 1 
+parallel_threads_per_cpu     integer 2 
+recovery_parallelism     integer 0
+</code></pre><p>以上这些参数是与并行功能直接相关的，除此之外还有许多参数会间接地影响并行能力， 下面就介绍一些最重要的参数。 </p>
+<h3 id="1-PARALLE-MAX-SERVERS"><a href="#1-PARALLE-MAX-SERVERS" class="headerlink" title="1.PARALLE_MAX_SERVERS"></a>1.PARALLE_MAX_SERVERS</h3><p>Oracle 的并行处理是通过专门进程完成的，这些就是前面说过的 Slave Process。并行进程是在数据库范围共享使用的，数据库里所有的并行进程组成一个进程池（PX Server Pool），每 当需要并行操作时，就会从这个池中取得足够数量的并行进程，当操作执行结束后，还需要把 并行进程返回这个池中。PARALLE_MAX_SERVERS 参数就是控制数据库范围内并行进程的最 大数量。这也是一种自我保护机制，如果不控制并行进程的数量很容易消耗光系统资源。 </p>
+<p>参数的缺省值=CPU 数量×10。如果把这个参数设置成 0，就相当于在数据库范围内禁用了 并行。 </p>
+<h3 id="2-PARALLEL-MIN-SERVERS"><a href="#2-PARALLEL-MIN-SERVERS" class="headerlink" title="2.PARALLEL_MIN_SERVERS"></a>2.PARALLEL_MIN_SERVERS</h3><p>PARALLEL_MIN_SERVERS 参数定义进程池中最少要保有的并行进程数量，在数据库启 动时，这些进程就要被启动，并且在数据库生命期内要一直保持运行状态，即使没有用到并行 操作。 </p>
+<p>如果需要的 Slave Process超过了这个数量，Oracle 就会动态地增加 Slave Process，这些动 态增加的 Slave Process 完成任务后会等待 5 分钟，这 5 分钟内如果没有新的任务分配，Oracle 就结束这些进程。 </p>
+<p>PARALLEL_MIN_SERVERS参数的缺省值是 0，因此在测试并行时可以观察到，当发出一 个SQL语句后，通常要经过一段时间后才能看到P00n进程生成。这时会话表现等待在“os thread startup”事件上的。如果把这个参数设置成非 0 值，数据库实例启动时就会同时启动若干并行 进程，就可以减少启动新的并行进程的延迟时间。 </p>
+<p>查看 PS Server 的使用情况： </p>
+<pre><code>SQL&gt; select * from v$px_process_sysstat 
+ where statistic like &apos;Server%&apos;; 
+
+STATISTIC     VALUE 
+------------------------------------------------------------ ---------- 
+Servers     In Use     0 
+Servers     Available     20 
+Servers     Started 1924 
+Servers     Shutdown     1904 
+Servers     Highwater     20 
+Servers     Cleaned Up     0 
+Server     Sessions     9488 
+</code></pre><ul>
+<li>Server In Use：当前正在工作的有 0 个。 </li>
+<li>Servers Available：当前可用的进程是 20，这是因为 parallel_min_servers 参数定义为 20，所以总是有 20 个进程可以使用。 </li>
+<li>Server Started：数据库启动以来启动的进程数量。 </li>
+<li>Server Shutdown：关闭的进程数量。</li>
+</ul>
+<h3 id="3-PARALLEL-EXECUTION-MESSAGE-SIZE"><a href="#3-PARALLEL-EXECUTION-MESSAGE-SIZE" class="headerlink" title="3.PARALLEL_EXECUTION_MESSAGE_SIZE"></a>3.PARALLEL_EXECUTION_MESSAGE_SIZE</h3><p>并行操作中必须的进程间通信（包括 Slave Process 和 Query Coordinator 之间，以及 Producer/Consumer模式的 Slave Process 之间）都是通过 Table Queue 实现的，所谓 Table Queue 实际就是共享内存，这些内存可以在 SGA的 Large Pool 中，也可以在 SGA的 Shared Pool 中。 Oracle 推荐应该把它放在 Larege Pool 中，以避免造成 Shared Pool 碎片。 </p>
+<p>利用下面语句可以判断 Table Queue 是在哪个 Pool中分配的，可以通过以下语句查询： </p>
+<pre><code>SQL&gt; select * from v$sgastat 
+ 2 where name =&apos;PX msg pool&apos;; 
+
+POOL NAME BYTES 
+------------ -------------------------- ---------- 
+shared pool PX msg pool 774720 
+</code></pre><p>这个查询结果显示 Table Queue 是在 Shared Pool 中分配的，这是应该避免的情况。如果是 在 Large Pool 中分配，查询结果就如下所示： </p>
+<pre><code>POOL NAME BYTES 
+------------ -------------------------- ---------- 
+large pool PX msg pool 1076024 
+</code></pre><p>对于 Oracle 10g，有两种途径把 Table Queue 放在 Large Pool 中： </p>
+<ul>
+<li>使用 SGA 的自动调整，也就是设置 SGA_TARGET 参数为非 0 值； </li>
+<li>如果没有使用 SGA 的自动管理，通过把参数 parallel_automatic_tuning 设置成 TRUE  也可以实现，这个参数缺省是 FALSE。 </li>
+</ul>
+<p>每个 Table Queue 是由3个（在 RAC环境下是 4个）Buffer组成的，这个参数定义的就是 每个 Buffer的大小，单位是 Bytes，缺省值是 2152Bytes。缺省值在大多数场合下都显得偏小， 可以把它调整成 16KB、32KB、64KB 等。 </p>
+<p>在调整这个参数前，需要考虑对内存的消耗情况，可以使用下面的公式来估计： </p>
+<pre><code>memory≥ parallel_max_servers×parallel_max_servers×parallel_execution_message_size×3 or 4 
+</code></pre><p>其中PARALLEL_MAX_SERVERS×PARALLE_MAX_SERVERS代表Table Queue最多时的 数量，因为在 Producer/Consumer模式下，Slave Process 是配对分配的。 </p>
+<h3 id="4-PARALLEL-AUTOMATIC-TUNNING"><a href="#4-PARALLEL-AUTOMATIC-TUNNING" class="headerlink" title="4.PARALLEL_AUTOMATIC_TUNNING"></a>4.PARALLEL_AUTOMATIC_TUNNING</h3><p>PARALLEL_AUTOMATIC_TUNNING参数如果设置成 TRUE，Oracle 会做两件事：首先是 调整若干 PARALLEL参数值；其次，就是把 Table Qieue 放在 Large Pool 中。虽然在Oracle 10g中，这已经是一个废弃的参数了。不过仍然可以利用这个参数的后一种功能，达到强迫Oracle 把 Table Queue 放在 Large Pool 中的效果。 </p>
+<h3 id="5．PARALLEL-ADAPTIVE-MULTI-USER"><a href="#5．PARALLEL-ADAPTIVE-MULTI-USER" class="headerlink" title="5．PARALLEL _ADAPTIVE_MULTI_USER"></a>5．PARALLEL _ADAPTIVE_MULTI_USER</h3><p>并行处理功能是一个性能加速器，但如果使用不当，又会成为性能杀手。这一点也很好理 解，如果所有的操作都使用并行处理，很快系统资源就会被消耗尽。比如表 A 的并行度是 4，那么所有这对这个表的访问都会使用 4 个 Slave Process，如果 PARALLEL_MAX_SERVERS 是 40，只要有10 个用户就可以耗尽整个 PX Pool。不仅如此，大量的并行进程会长时间占用 CPU、 磁盘资源，使得其他用户的操作根本没有执行的机会。因此需要对并行处理作控制。Oracle 10g 有两个参数可以调节并行，这个参数就是其中之一。 </p>
+
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Oracle/" rel="tag">#Oracle</a>
+          
+            <a href="/tags/Oracle-DBA/" rel="tag">#Oracle DBA</a>
+          
+            <a href="/tags/Oracle-并行/" rel="tag">#Oracle 并行</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/22/oracle-sql-performance-pre/" rel="prev" title="Oracle数据库性能杂谈">
+                Oracle数据库性能杂谈 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/04/22/oracle-concurrent/"
+           data-title="Oracle 并行操作" data-url="http://yoursite.com/2016/04/22/oracle-concurrent/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/default_avatar.jpg"
+               alt="nansheng.su" />
+          <p class="site-author-name" itemprop="name">nansheng.su</p>
+          <p class="site-description motion-element" itemprop="description">分享技术，记录成长</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.sunansheng.com" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  个人主页
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/sunansheng/" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  CSDN博客
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#并行架构"><span class="nav-number">1.</span> <span class="nav-text">并行架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#进程"><span class="nav-number">1.1.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关参数"><span class="nav-number">1.2.</span> <span class="nav-text">相关参数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-PARALLE-MAX-SERVERS"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.PARALLE_MAX_SERVERS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-PARALLEL-MIN-SERVERS"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.PARALLEL_MIN_SERVERS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-PARALLEL-EXECUTION-MESSAGE-SIZE"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.PARALLEL_EXECUTION_MESSAGE_SIZE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-PARALLEL-AUTOMATIC-TUNNING"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.PARALLEL_AUTOMATIC_TUNNING</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5．PARALLEL-ADAPTIVE-MULTI-USER"><span class="nav-number">1.2.5.</span> <span class="nav-text">5．PARALLEL _ADAPTIVE_MULTI_USER</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nansheng.su</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"snansblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("leuGvK5gjuBpFkrJf7w3PU6u-gzGzoHsz", "NaAToFBQL6W5r3Acwl9ji6mN");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
