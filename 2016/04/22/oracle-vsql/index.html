@@ -64,7 +64,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Oracle 性能优化," />
 
 
 
@@ -80,15 +80,16 @@
 
 
 
-<meta name="description" content="分享技术，记录成长">
-<meta property="og:type" content="website">
-<meta property="og:title" content="苏南生的博客">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="高资源消耗的 SQL与用户执行 SQL 有关的动态视图有 v$sql、v$sqlarea、v$sqltext、v$sql_plan、 v$sqlstats 等。v$sql 中包含了所有用户执行的所有 SQL 信息，不同用户、不同会 话执行相同 SQL 的语义、执行计划可能会不同，这些 SQL 字面值相同（具有相同 的 sql_id），通过不同的 child_number 来区分。v$sqlarea">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Oracle 性能优化之高消耗的SQL">
+<meta property="og:url" content="http://yoursite.com/2016/04/22/oracle-vsql/index.html">
 <meta property="og:site_name" content="苏南生的博客">
-<meta property="og:description" content="分享技术，记录成长">
+<meta property="og:description" content="高资源消耗的 SQL与用户执行 SQL 有关的动态视图有 v$sql、v$sqlarea、v$sqltext、v$sql_plan、 v$sqlstats 等。v$sql 中包含了所有用户执行的所有 SQL 信息，不同用户、不同会 话执行相同 SQL 的语义、执行计划可能会不同，这些 SQL 字面值相同（具有相同 的 sql_id），通过不同的 child_number 来区分。v$sqlarea">
+<meta property="og:updated_time" content="2016-04-22T07:21:34.874Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="苏南生的博客">
-<meta name="twitter:description" content="分享技术，记录成长">
+<meta name="twitter:title" content="Oracle 性能优化之高消耗的SQL">
+<meta name="twitter:description" content="高资源消耗的 SQL与用户执行 SQL 有关的动态视图有 v$sql、v$sqlarea、v$sqltext、v$sql_plan、 v$sqlstats 等。v$sql 中包含了所有用户执行的所有 SQL 信息，不同用户、不同会 话执行相同 SQL 的语义、执行计划可能会不同，这些 SQL 字面值相同（具有相同 的 sql_id），通过不同的 child_number 来区分。v$sqlarea">
 
 
 
@@ -106,7 +107,7 @@
   };
 </script>
 
-  <title> 苏南生的博客 </title>
+  <title> Oracle 性能优化之高消耗的SQL | 苏南生的博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -127,9 +128,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left 
-   page-home 
- ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -206,9 +205,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
   
@@ -228,10 +227,7 @@
             
             
               
-                
-                <a class="post-title-link" href="/2016/04/22/oracle-vsql/" itemprop="url">
-                  Oracle 性能优化之高消耗的SQL
-                </a>
+                Oracle 性能优化之高消耗的SQL
               
             
           </h1>
@@ -305,317 +301,103 @@
       
 
       
-        
-          <h2 id="高资源消耗的-SQL"><a href="#高资源消耗的-SQL" class="headerlink" title="高资源消耗的 SQL"></a>高资源消耗的 SQL</h2><p>与用户执行 SQL 有关的动态视图有 v$sql、v$sqlarea、v$sqltext、v$sql_plan、 v$sqlstats 等。v$sql 中包含了所有用户执行的所有 SQL 信息，不同用户、不同会 话执行相同 SQL 的语义、执行计划可能会不同，这些 SQL 字面值相同（具有相同 的 sql_id），通过不同的 child_number 来区分。v$sqlarea 中仅包含 SQL 语句的字面 信息，忽略了相同 SQL 语句在执行会话、语义、执行计划上的不同，相同的 SQL 语句在 v$sqlara 中仅以一行显示。v$sqltext 以多个 piece 的形式给出了 SQL 语句 的完整文本，它通过字段 address 和 hash_value 的联合可以唯一地标识一条 SQL 语句。v$sql_plan 包含了 SQL 语句的执行计划信息，它通过 address、hash_value、 child_number 三个字段（可以和 v$sql 关联）唯一地标识 SQL 语句的执行计划。 v$sqlstats 包含 SQL 语句的性能统计信息，通过 sql_id 和 plan_hash_value 可以唯一 地标识一条 SQL 语句的性能统计数据。v$sqlstats 视图的字段是 v$sql 和 v$sqlarea 字段的子集，即视图中的内容来自于它们，但 v$sqlstats 视图中的数据比 v$sql 和 v$sqlarea 保存更持久。</p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/22/oracle-vsql/" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
+        <h2 id="高资源消耗的-SQL"><a href="#高资源消耗的-SQL" class="headerlink" title="高资源消耗的 SQL"></a>高资源消耗的 SQL</h2><p>与用户执行 SQL 有关的动态视图有 v$sql、v$sqlarea、v$sqltext、v$sql_plan、 v$sqlstats 等。v$sql 中包含了所有用户执行的所有 SQL 信息，不同用户、不同会 话执行相同 SQL 的语义、执行计划可能会不同，这些 SQL 字面值相同（具有相同 的 sql_id），通过不同的 child_number 来区分。v$sqlarea 中仅包含 SQL 语句的字面 信息，忽略了相同 SQL 语句在执行会话、语义、执行计划上的不同，相同的 SQL 语句在 v$sqlara 中仅以一行显示。v$sqltext 以多个 piece 的形式给出了 SQL 语句 的完整文本，它通过字段 address 和 hash_value 的联合可以唯一地标识一条 SQL 语句。v$sql_plan 包含了 SQL 语句的执行计划信息，它通过 address、hash_value、 child_number 三个字段（可以和 v$sql 关联）唯一地标识 SQL 语句的执行计划。 v$sqlstats 包含 SQL 语句的性能统计信息，通过 sql_id 和 plan_hash_value 可以唯一 地标识一条 SQL 语句的性能统计数据。v$sqlstats 视图的字段是 v$sql 和 v$sqlarea 字段的子集，即视图中的内容来自于它们，但 v$sqlstats 视图中的数据比 v$sql 和 v$sqlarea 保存更持久。</p>
+<a id="more"></a>
+<p>当我们需要根据各种资源消耗查找 top SQL 时，可以根据不同的性能统计字 段查询 v$sql，该视图不仅包含用户提交给数据库的 SQL 语句及其文本，而且还包含这些语句的性能统计数据。表 13.1 给出了资源消耗与 v$sql 视图相关字段的 说明。 </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">资 源 消 耗</th>
+<th>字段及其说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">执行代价 cost</td>
+<td>optimizer_cost 优化器给出的执行代价</td>
+</tr>
+<tr>
+<td style="text-align:center">CPU 消耗</td>
+<td>cpu_time、elapsed_time <br>每次执行的 CPU 耗时= cpu_time/executions<br>每次执行消耗的时间= elapsed_time/executions</td>
+</tr>
+<tr>
+<td style="text-align:center">I/O 消耗</td>
+<td>disk_reads <br>每次执行的磁盘读次数= disk_reads/executions</td>
+</tr>
+<tr>
+<td style="text-align:center">内存消耗</td>
+<td>buffer_gets、sharable_mem（消耗 shared pool）<br>每次执行的缓存消耗= buffer_gets/executions</td>
+</tr>
+<tr>
+<td style="text-align:center">语句解析消耗</td>
+<td>parse_calls 该语句（硬）解析的次数</td>
+</tr>
+<tr>
+<td style="text-align:center">排序消耗</td>
+<td>sorts</td>
+</tr>
+<tr>
+<td style="text-align:center">检索记录数</td>
+<td>rows_processed、fetches</td>
+</tr>
+</tbody>
+</table>
+<h2 id="top-SQL-查询示例"><a href="#top-SQL-查询示例" class="headerlink" title="top SQL 查询示例"></a>top SQL 查询示例</h2><p>（1）查询最消耗 CPU 时间的前 10 个 SQL 语句。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; SELECT *</span><br><span class="line">  2    FROM (SELECT sql_id,</span><br><span class="line">  3                 child_number</span><br><span class="line">  4            FROM v$sql</span><br><span class="line">  5           ORDER BY cpu_time DESC)</span><br><span class="line">  6   WHERE rownum &lt;= 10;</span><br><span class="line">SQL_ID        CHILD_NUMBER</span><br><span class="line">------------- ------------</span><br><span class="line">f5mkwycvxw09f            0</span><br><span class="line">d0knq1hqbsunv            0</span><br><span class="line">5khbzgpncr2an            0</span><br><span class="line">0v9u9pcwk93xq            0</span><br><span class="line">65p9vk5a6khar            0</span><br><span class="line">a1vukjd565f1p            0</span><br><span class="line">9ur5wdahzm0r8            0</span><br><span class="line">7ht68a765a5wk            0</span><br><span class="line">g1ppkt6aam9q8            0</span><br><span class="line">5zruc4v6y32f9            0</span><br><span class="line">10 rows selected</span><br></pre></td></tr></table></figure></p>
+<p>（2）查询消耗磁盘读次数最多的 10 个 SQL 语句。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; SELECT *</span><br><span class="line">  2    FROM (SELECT sql_id,</span><br><span class="line">  3                 child_number,</span><br><span class="line">  4                 round(disk_reads / executions) dsk_rds</span><br><span class="line">  5            FROM v$sql</span><br><span class="line">  6           WHERE executions &gt; 0</span><br><span class="line">  7           ORDER BY dsk_rds DESC)</span><br><span class="line">  8   WHERE rownum &lt;= 10;</span><br><span class="line">SQL_ID        CHILD_NUMBER    DSK_RDS</span><br><span class="line">------------- ------------ ----------</span><br><span class="line">3trrg5vyyp34v            0     503659</span><br><span class="line">6mcpb06rctk0x            0     357586</span><br><span class="line">9t76mbbnfd6qx            0     313762</span><br><span class="line">2zsg19udkb16g            0     275046</span><br><span class="line">gbmz0s1k7c0hd            1     221525</span><br><span class="line">5zruc4v6y32f9            0     167840</span><br><span class="line">3mh20bujr6cd0            0     147844</span><br><span class="line">b1wtt4gzadtqs            0      98749</span><br><span class="line">0f0unwp9ypug8            0      98747</span><br><span class="line">05s9358mm6vrr            0      87929</span><br><span class="line">10 rows selected</span><br></pre></td></tr></table></figure></p>
+<p>另外，ORACLE 提供了一个视图 v$session_longops，记录了所有超过 6 秒的 会话操作，如执行备份与恢复操作、统计信息的收集等，包括执行超过 6 秒的 SQL 语句（需要设置 timed_statistics 为 true 并需要统计信息的支持）。可以通过该视图 获得响应时间较长的 SQL 语句信息，通过字段 sql_address 和 sql_hash_value 与视 图 v$sql（或 v$sqltxt）联接可以获得完整的 SQL 语句的文本。 </p>
+<p>本文地址：<a href="http://blog.sunansheng.com/2016/04/22/oracle-vsql/" target="_blank" rel="external">http://blog.sunansheng.com/2016/04/22/oracle-vsql/</a></p>
+
       
     </div>
     
     <div>
       
+        
+      
     </div>
 
     <div>
+      
+        
       
     </div>
 
     <footer class="post-footer">
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/04/22/oracle-sql-performance-pre/" itemprop="url">
-                  Oracle数据库性能杂谈
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-22T13:41:41+08:00" content="2016-04-22">
-              2016-04-22
-            </time>
-          </span>
-
+        <div class="post-tags">
           
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Oracle-性能优化/" itemprop="url" rel="index">
-                    <span itemprop="name">Oracle 性能优化</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
+            <a href="/tags/Oracle-性能优化/" rel="tag">#Oracle 性能优化</a>
           
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/22/oracle-sql-performance-pre/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/22/oracle-sql-performance-pre/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-             <span id="/2016/04/22/oracle-sql-performance-pre/" class="leancloud_visitors" data-flag-title="Oracle数据库性能杂谈">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <p>数据库系统出现性能问题，其根本原因是系统资源出现瓶颈，这里的资源瓶 颈包括硬件瓶颈和软件瓶颈。内存、CPU、I/O 是硬件资源，如果这些资源出现瓶 颈，则系统出现硬件瓶颈。软件瓶颈则是由于软件设计的数据处理不合理导致的 性能问题。很多情况下，硬件瓶颈是由于应用软件的不合理导致的，我们这里说 的性能调优，其目标是在硬件资源有限的情况下，通过调整应用和配置，使得应 用软件配合硬件资源协调运行。 </p>
-<h1 id="内存问题"><a href="#内存问题" class="headerlink" title="内存问题"></a>内存问题</h1><p>现代计算机系统的内存操作要比磁盘操作快得多，因此一般认为 I/O 瓶颈是 计算机系统常见的性能瓶颈之一。数据库系统性能调优的目标之一是将所有的数 据处理置于内存中完成，因此一般认为增加内存能改善数据库系统的性能。但如 果认为若所有的数据处理都能在内存中完成，数据库系统就不存在性能问题，也 是不妥当的，因为数据库系统的性能问题涉及多种计算机资源的“争用（contention）” 与“耗尽（exhausted）”问题。 </p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/22/oracle-sql-performance-pre/" rel="contents">
-              阅读全文 &raquo;
-            </a>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/22/oracle-sql-performance-pre/" rel="next" title="Oracle数据库性能杂谈">
+                <i class="fa fa-chevron-left"></i> Oracle数据库性能杂谈
+              </a>
+            
           </div>
-        
-      
-    </div>
-    
-    <div>
-      
-    </div>
 
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
+          <div class="post-nav-prev post-nav-item">
             
-            
-              
-                
-                <a class="post-title-link" href="/2016/04/22/oracle-concurrent/" itemprop="url">
-                  Oracle 并行操作
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-22T11:52:18+08:00" content="2016-04-22">
-              2016-04-22
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Oracle/" itemprop="url" rel="index">
-                    <span itemprop="name">Oracle</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Oracle/Oracle-DBA/" itemprop="url" rel="index">
-                    <span itemprop="name">Oracle DBA</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/22/oracle-concurrent/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/22/oracle-concurrent/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-             <span id="/2016/04/22/oracle-concurrent/" class="leancloud_visitors" data-flag-title="Oracle 并行操作">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
+          </div>
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <p>SQL 语句缺省是在一个 CPU上串行（Serial）执行的，即便系统中有多个 CPU存在，一个 SQL 语句也无法利用它们。这样一来一个 CPU 所能使用的资源就决定了 SQL 语句的性能。这 时提升性能的另一种方法就应运而生，也就是并行处理——同时利用多个 CPU进行工作。</p>
-<p>正统的理论界认为，企业的数据库有两种类型，OLTP 和 OLAP，前者用于业务处理，其 特点是大量的运行时间很短的事务型 SQL 语句，并行操作在这种系统中作用有限。后一种用于 数据分析，其特点是大量的查询型 SQL 语句，这里才是并行操作大展身手的舞台。但在实际的 企业环境中，由于成本的制约，可能无法部署一台单独的 OLAP 数据仓库。功能界限的也就无 法绝对切割，很多 7×24 的业务数据库也要支持数据统计分析功能，虽然理论上这些功能应该 是在一个独立的数据仓库中完成。因此无论对于数据仓库还是 OLTP 系统，并行处理是一个非 常有用的工具。 </p>
-<h1 id="并行架构"><a href="#并行架构" class="headerlink" title="并行架构"></a>并行架构</h1><p>Oracle 的并行处理是从 1996 年的 Oracle 7.3 版本开始出现的，随着 Oracle 数据库的发展， 这个功能也不断得到发展和提升。习惯上用户都觉得似乎只有数据仓库才能从并行能力中获益， 其实这中理解并不全面。Oracle 的并行处理并不局限于查询功能（SELECT），DML 操作 （INSERT、UPDATE、DELETE）、DDL 操作（CREATE TABLE、CREATE INDEX），收集统计 数据、加载数据、备份恢复等功能都已经获得了并行支持。因为并行处理可以充分利用多个硬 件资源，利用率越高，处理得效率也会更高。有了并行处理后，TB 级的数据可以在几十分钟 内完成，而不必等待一天或更长的时间，但是处理能力的提升并不是线形关系，如图 7-1 所示， 这是因为数据库处理涉及多个部件，包括 CPU、内存、磁盘 IO，这些部件如果不能同步地扩展， 那么总的性能提升能力会受限于最弱的一环，也就是短板理论。</p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/22/oracle-concurrent/" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-    
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -623,6 +405,14 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/04/22/oracle-vsql/"
+           data-title="Oracle 性能优化之高消耗的SQL" data-url="http://yoursite.com/2016/04/22/oracle-vsql/">
+      </div>
+    
+  </div>
+
 
         </div>
         
@@ -642,8 +432,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/default_avatar.jpg"
@@ -715,6 +514,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#高资源消耗的-SQL"><span class="nav-number">1.</span> <span class="nav-text">高资源消耗的 SQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#top-SQL-查询示例"><span class="nav-number">2.</span> <span class="nav-text">top SQL 查询示例</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -817,6 +627,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 
