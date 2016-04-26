@@ -1450,11 +1450,13 @@ pre .javascript .function {
 .site-author-name {
   margin: 5px 0 0;
   color: #222;
+  text-indent: 0;
 }
 .site-description {
   margin-top: 5px;
   font-size: 13px;
   color: #999;
+  text-indent: 0;
 }
 .site-state {
   overflow: hidden;
@@ -1523,7 +1525,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #b05c3d;
+  background: #af0aff;
 }
 .links-of-blogroll {
   font-size: 13px;
