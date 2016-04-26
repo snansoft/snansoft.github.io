@@ -1284,7 +1284,7 @@ pre .javascript .function {
   }
 }
 .post-more-link {
-  margin-top: 50px;
+  margin-top: 40px;
 }
 .post-more-link .btn {
   color: #555;
@@ -1337,10 +1337,10 @@ pre .javascript .function {
 }
 .posts-expand .post-eof {
   display: block;
-  margin: 80px auto 60px;
-  width: 8%;
+  margin: 40px auto 60px;
+  width: 50%;
   height: 1px;
-  background: #ccc;
+  background: #ddd;
   text-align: center;
 }
 .post:last-child .post-eof.post-eof.post-eof {
@@ -1523,7 +1523,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #ff74ff;
+  background: #b05c3d;
 }
 .links-of-blogroll {
   font-size: 13px;
