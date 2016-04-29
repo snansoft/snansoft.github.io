@@ -239,217 +239,6 @@
             
               
                 
-                <a class="post-title-link" href="/2016/04/29/oracle-memory/" itemprop="url">
-                  Oracle 内存结构详解
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-29T14:30:15+08:00" content="2016-04-29">
-              2016-04-29
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Oracle-DBA/" itemprop="url" rel="index">
-                    <span itemprop="name">Oracle DBA</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Oracle-DBA/Oracle-体系结构/" itemprop="url" rel="index">
-                    <span itemprop="name">Oracle 体系结构</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/29/oracle-memory/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/29/oracle-memory/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-             <span id="/2016/04/29/oracle-memory/" class="leancloud_visitors" data-flag-title="Oracle 内存结构详解">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="内存结构"><a href="#内存结构" class="headerlink" title="内存结构"></a>内存结构</h3><p>现代计算机中，CPU 对内存的访问速度要比从磁盘的速度快千倍，因此 Oracle 对于数据的访问 也尽量都在内存中完成，而不是直接修改硬盘上的数据。内存内容在合适的时候再同步到磁盘。 Oracle 利用内存来克服磁盘 IO的束缚，在内存中进行活动越多，系统性能越好，反之，在磁盘上进 行的操作越多，系统性能越差。 </p>
-<p>Oracle 是一个内存消耗大户，它消耗的内存可以分成两部分——<strong>进程共享部分</strong>和<strong>进程专有部分</strong>。 这里的进程专指Oracle 进程（Server Process 和Background Process），进程共享部分就叫做<strong> SGA </strong>（Shared Global Area ），进程专有部分就叫做 <strong>PGA </strong>（Program Global Area）。 </p>
-<p>对于不同类型的应用系统，这两个部分的意义也不同。对于OLTP系统，其特征大量的小事务， SGA 要比PGA更为重要。对于OLAP 系统来说，其特征是大数据量的关联，因此PGA 要比SGA 对系统的影响更大。因为PGA 直接决定了大的排序、哈希操作效率。 </p>
-<h3 id="1．SGA"><a href="#1．SGA" class="headerlink" title="1．SGA"></a>1．SGA</h3><p>SGA 是一大块内存的总称，其内部分成若干组成部分，下图是一个典型的 SGA 示意图，每 个部分都有独特的作用。<br><img src="http://img.blog.csdn.net/20160429144237515" alt=""></p>
-<h3 id="2．Data-Buffer-Cache"><a href="#2．Data-Buffer-Cache" class="headerlink" title="2．Data Buffer Cache"></a>2．Data Buffer Cache</h3><p>由Server Process 从磁盘读入的数据就放在这块内存中。而修改数据时，也是在这个区域中对数 据进行修改。Data Buffer Cache 中会同时保留数据库被修改前（Before Image，前镜像）和被修改后 （After Image ，后镜像）的拷贝。 </p>
-<p>Data Buffer Cache 中的内存可以被分成 3 类:</p>
-<ul>
-<li>Free Buffers：指那些不包含任何数据的内存，这些内存可以用来装载以后读入的数据。 </li>
-<li>Dirty Buffer：这部分包含被修改过的，但是还没有写到磁盘上的数据块。 </li>
-<li>Pinned Buffer：正在被用户使用的内存。 </li>
-</ul>
-<p>当用户进程请求数据时，Oracle 首先查看数据是否已经在 Data Buffer Cache 中，如果数据已在 Data Buffer Cache 中，则 Server Process不必再访问磁盘，直接从 SGA 中读取数据就可以了。如果 数据还没有加载到SGA ，Server Process就必须从磁盘读入数据，但是在读入之前，Server Process 必须保证Data Buffer Cache 中有足够的 Free Buffer 来容纳这些数据，如果Server Process在扫描一 定数量的Buffer 后还没有找到Free Buffer ，它就会通知DBWn 进程把Dirty Buffer写到磁盘上，一 旦些完成，原先这些Dirty Buffer 就变成 Free Buffer ，就可以重用了。 </p>
-<p>究竟把哪些个Dirty Buffer 写到磁盘？这就会用到LRU（Least Recently Used）算法了，这种算 法确保最近越少被使用的数据块，越先被写到磁盘，空间越先被释放。这种算法是基于这样一个假 设：“越近被用到的数据，就越有可能被再次用到”。在 Data Buffer Cache 中，不仅有一个 LRU List 存在，而是同时使用多个 LRU List ，如 Free Buffer 、Dirty Buffer 、Pinned Buffer 都是使用LRU算法。 </p>
-<p><strong>（1）按照用途不同的多个 Buffer Cache。 </strong></p>
-<p>大部分情况下数据库有一个缺省的Buffer Cache放置所有的数据就足够了，不过 Oracle 允许通 过多个Buffer Cache进行微调。 </p>
-<p>数据库中的不同数据的访问频率是不一样的，像用户属性、商品列表这种字典型数据可能需要 经常使用，因此这类数据应该尽可能久的放在 Buffer Cache中，而一些日志型数据只会偶尔采用到， 这类数据就应该尽快地从Buffer Cache中移走，以释放空间。对于符合这种特点的应用来说，Oracle 提供了其他两种Buffer Cache——Keep Buffer Pool和Recycle Buffer Pool，再加上缺省的 Buffer Cache 就有3 种Buffer Pool 了。这 3 种的区别在于对其中数据的保留策略，Keep就是保留得尽量久，而 Recycle就是尽快释放，如表所示。 </p>
-<table>
-<thead>
-<tr>
-<th>Buffer Pool 名称</th>
-<th>初始化参数</th>
-<th>说     明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Keep Buffer Pool</td>
-<td>DB_KEEP_CACHE_SIZE</td>
-<td>这个区域内的数据会尽可能久地保留在内存中。 对于那些体积较小、访问频繁的表，比如用户属 性表，可以考虑放在这个Cache 中，以提高访问 速度</td>
-</tr>
-<tr>
-<td>Recycle Buffer Pool</td>
-<td>DB_RECYCLE_CACHE_SIZE</td>
-<td>放在这个区域中的数据一用完就会被移出。对于 那些体积巨大、偶尔使用的日志表，可以考虑放 在这个内存中，以尽快释放内存</td>
-</tr>
-<tr>
-<td>Default Buffer Pool</td>
-<td>DB_CACHE_SIZE</td>
-<td>缺省的Cache</td>
-</tr>
-</tbody>
-</table>
-<p><strong>（2 ）按照数据块大小的多个 Buffer Pool 。 </strong></p>
-<p>除了按照保留时间划分Buffer Cache，Oracle 还可以按照数据块的大小分配多个 Buffer Cache。 Oracle 10g 中允许创建不同数据块大小的表空间，DBA 在创建数据库时需要使用的 DB_BLOCK_SIZE 参数，这个参数决定的是数据库标准数据块大小，以后创建的表空间缺省会继承 这个块大小。但是DBA也可以用其他数据块大小创建表空间，最多可以使用5 种不同数据块大小 （2KB 、4KB 、8KB 、16KB、32KB），这些表空间叫做非标准数据块大小的表空间。要想在一个数据 库内同时使用多种数据块大小，一个重要的条件就是必须要配置对应的非标准Buffer Cache。对应 参数是DB_nK_CACHE_SIZE。 </p>
-<p>之前提到的Keep Buffer Pool、Recycle Buffer Pool都只用于标准数据块。而Default Buffer Pool 则是由所有的标准和非标准Buffer Pool 组和在一起的。所谓标准、非标准是根据创建数据库时指定 的DB_BLOCK_SIZE 而言的，如果这个值是2KB ，那么其他的4KB 、8KB 、16KB、32KB 就叫做 非标准数据块。如果定义成 32KB，那么 2KB 、4KB 、8KB 、16KB 就叫做非标准数据块。</p>
-<h3 id="3．Shared-Pool"><a href="#3．Shared-Pool" class="headerlink" title="3．Shared Pool"></a>3．Shared Pool</h3><p>Shared Pool是SGA 中另一个非常重要的区域，尤其对于OLTP系统来说，Shared Pool配置对 于系统性能的意义尤为重要。和 Data Buffer Cache 存放的是用户数据不同，Shared Pool 中存放的是 代码，包括PL/SQL 代码、SQL 语句以及数据字典信息。Shared Pool又可以分成 <strong>Library Cache</strong> 和 <strong>Dictionary Cache</strong>两个区域。 </p>
-<p>如果用户有过其他语言的开发经验，一定知道编译过程，也就是要把用户代码转换成机器语言，比如Java 语言要把*.java 文件编译成.class 文件。数据库也是一样，用户提交的无论是用 PL/SQL 编 写的存储过程或者纯粹的SQL 代码，这些代码都是基于人类语言编写的，要想计算机能够执行这些 代码，首先要把它们编译成 CPU 可识别的机器代码，这个过程就是编译。而编译产生的机器代码就 保存在Library Cache 中，Shared Pool 是一个所有用户可以共享的区域，这样就可以获得两个好处： 首先，用户如果再次执行同一段代码时，就可以省掉解析过程，直接重用先前生成的机器代码；其 次，如果其他用户执行相同代码，也能够重用，减少解析。 </p>
-<p>一个SQL 语句完整执行过程可以分成 4 个阶段:</p>
-<p><strong>（1） 解析。 </strong><br>在这个阶段，要进行语义、语法分析、权限检查，包括语句是否拼写正确、是否有语法错误、 数据库是否有a 这个对象、用户是否有 a 的访问权限等。 </p>
-<p>这些检查通过后，再检查这个语句之前是否已经解析过了。Oracle 对每个语句都会计算出哈希 值，用这个值在Shared Pool 中查看是否有对应的执行计划。如果有，就说明这个语句曾经执行过， 已有的执行计划拿过来就可以使用，而不再需要执行下面的（2 ）、（3）步（这也就是只进行<strong>软解析</strong> Soft Parse）；如果没有，则必须（1 ）、（2 ）、（3 ）步都执行完后才能产生执行计划（也就是所谓的 Hard Parse）。 </p>
-<p><strong>（2 ）优化。 </strong></p>
-<p>这个阶段根据对象的统计信息、当前选择的优化器模式（CBO/RBO）来确定最佳访问路径。所 谓对象的统计信息，比如一个表里面有多少条记录、每条记录平均长度、占据多少个数据块、索引 的高度等。这些信息记录在系统字典中，比如user_tables.num_rows 。</p>
-<p>另外一个影响优化的因素是“优化器模式”（Optimizer Mode ）。这个配置是告诉 Oracle 希望如 何返回记录，比如 first_rows_n代表尽快返回头 n 条记录；all_rows 代表着尽快返回整个记录集，而 不关心头几条的返回速度。模式不同会产生不同的执行计划。 </p>
-<p>根据这两类信息，Oracle 的优化起引擎会产生多个访问路径，如全表扫描、索引扫描、Nest Loop Join 或Hash Join 等，Oracle 会计算每种访问路径的成本，把成本最小的访问路径作为最佳路径。 </p>
-<p><strong>（3 ）产生执行计划。</strong> </p>
-<p>这一阶段根据上一阶段产生的最小成本的访问路径，生成最终的执行计划。 </p>
-<p><strong>（4 ）返回查询结果。 </strong></p>
-<p>依据上一步的执行计划，访问数据获得结果集，返回给用户。如果是DML语句，而修改数据 并返回结果。<br>前3 个阶段是资源密集型操作，包括 CPU 、Latch、Lock各种资源，对于系统性能影响比较明 显。而Shared Pool 的目的就是为了减少前 3 个阶段的活动。 </p>
-<p><strong>Library Cache 中存放的代码部分，Dictionary Cache中存放的数据字典信息</strong>。在解析阶段，解析 器要判段表名、列名是否正确、用户是否有权限执行请求的操作，这些信息就是数据字典，包括在 接下来的优化阶段，CBO生成执行计划所用到的对象统计数据都来自于数据字典。如果这些数据不 在内存中，Oracle 就需要从数据字典把这些数据读入 Dictionary Cache。数据字典在 Dictionary Cache 缓存的越多、保留时间越长，解析时间越短，系统性能越好。 </p>
-<h3 id="4．Redo-Log-Buffer"><a href="#4．Redo-Log-Buffer" class="headerlink" title="4．Redo Log Buffer"></a>4．Redo Log Buffer</h3><p>Redo Log Buffer 使用来保存Redo 记录，和 Buffer Cahce、Shared Pool 比起来，这个区域空间 非常小，通常只有几MB。当一个Server Process 改变 Data Buffer Cache 中的数据时（DML操作）， 就会产生Redo记录，这些记录保存在 Redo Log Buffer 中。LGWR 进程负责把Redo Log Buffer 中的 内容写到磁盘上的Redo Log File 中。 </p>
-<p>Redo Log Buffer是采用循环方式工作的，一旦LGWR 进程把日志内容写到磁盘，LGWR 就可 以覆盖这块内容。LGWR 通常是系统中最繁忙的进程，Oracle 提供了一种 Nologging技术可以跳过 Redo Log生成，从而减少 LGWR 的负载，不过这个技术只是在有限的几种场合有用，比如直接数 据加载。 </p>
-<h3 id="5．Large-Pool-、Java-Pool、Stream-Pool"><a href="#5．Large-Pool-、Java-Pool、Stream-Pool" class="headerlink" title="5．Large Pool 、Java Pool、Stream Pool"></a>5．Large Pool 、Java Pool、Stream Pool</h3><p>这几个内存组件相对来说就不是很重要了，Large Pool 最主要的用途就是供 RMAN 备份和共享 连接模式。Java Pool 用于支持 Java 虚拟机（JVM ），Stream Pool 用于支持流。 </p>
-<h3 id="6．SGA自动管理"><a href="#6．SGA自动管理" class="headerlink" title="6．SGA自动管理"></a>6．SGA自动管理</h3><p>在Oracle 10g之前的版本中，SGA 各个组件的调整也是 DBA的日常工作之一。从 Oracle 10g开 始，这个区域能够自动调整了，这个特性是Oracle 自动管理功能的一部分，用户只需要设置一个新增 的参数 SGA_TARGET就可以实现 SGA 的自动调整。SGA 自动调整见后面章节。 </p>
-<h3 id="PGA"><a href="#PGA" class="headerlink" title="PGA"></a>PGA</h3><p>对于每个服务进程、后台进程，Oracle 都会为其分配一个 PGA ，这块内存区域用于保存每个用 户的私有数据。和SGA 的共享不同，PGA 是排他使用的。PGA 可以分成两部分。</p>
-<ul>
-<li><p><strong>Private SQL Area</strong>：这块区域用于保存 SQL 绑定变量信息，虽然 SQL 语句的执行计划可以 共享，但是每个用户的绑定变量信息却要保存在 PGA 中；OPEN_CRUSRO 定义的就是在 这块区域中，用户保留的 Cursor 数量。 </p>
-</li>
-<li><p><strong>Runtime  Area</strong>：每当 Session 执行一个语句时分配的空间，这块空间可以用于数据排序、 Hash、连接等，当语句执行完毕后，这块区域就被 Oracle 释放了。 </p>
-</li>
-</ul>
-<p>为了减少用户等待时间，加快响应速度，Oracle 会尽量在内存中完成排序、Hash、连接等操作， 这块内存就是PGA 的Runtime Area 中。如果操作能够在内存中完成，不需要磁盘IO，这种操作就 叫做Optimal Mode Operation。否则，如果不能在内存中完成，就会把部分中间数据先转移到磁盘上， 这种操作就叫做One（Multiple）-Pass（一路或多路）Operation。磁盘操作会降低系统性能。因此 PGA 大小和性能有密切关系。这些内存区域通过 SORT_AREA_SIZE、HASH_AREA_SIZE、 BITMAP_AREA_SIZE 定义。 </p>
-<p>Oracle 9i 开始引入了 PGA 的自动管理，通过把WORKAREA_SIZE_POLICY设置为AUTO 来 启用PGA 自动管理，如果这个参数设置成 MANUAL，就退回到手动管理。自动管理只需要定义一 个参数PGA_AGGREGATE_TRAGET 就好了。PGA 自动管理对于内存使用效率更高，比如如果使 用手动管理，那么每个会话分配的 PGA 不会自动归还给系统，无论会话是否执行操作还是 IDLE 状 态，都必须在用户退出后（Log Off）PGA 空间才会归还给系统，这就可能造成大量内存被闲置，而 真正需要工作的会话有无法获得足够的PGA ，而自动管理中，一旦会话执行的操作结束，使用的 Runtime-Area 就会自动归还给操作系统。 </p>
-
-          
-        
-      
-    </div>
-    
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/2016/04/29/oracle-back-process/" itemprop="url">
                   Oracle 后台进程详解
                 </a>
@@ -1493,7 +1282,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-count">7</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1501,7 +1290,7 @@
           
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1510,7 +1299,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
