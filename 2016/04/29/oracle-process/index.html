@@ -90,7 +90,7 @@ Oracle 提供的若干管理工具是典型的用户进程，比如RMAN 、SQL*P
 <meta property="og:description" content="Oracle 进程详解参与数据库活动的进程可以分成两大类，分别是用户进程和 Oracle 进程，而后者又可以分成服 务进程（Server Process ）和后台进程（Background Process）。
 1．用户进程
 Oracle 提供的若干管理工具是典型的用户进程，比如RMAN 、SQL*PLUS 、EXP 、IMP 、SQLLDR 等。当然也包括用户自己开发的各种应用程序，这些程序的特点">
-<meta property="og:updated_time" content="2016-04-29T05:36:24.009Z">
+<meta property="og:updated_time" content="2016-04-29T05:38:49.984Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Oracle 进程详解">
 <meta name="twitter:description" content="Oracle 进程详解参与数据库活动的进程可以分成两大类，分别是用户进程和 Oracle 进程，而后者又可以分成服 务进程（Server Process ）和后台进程（Background Process）。
@@ -320,6 +320,7 @@ Oracle 提供的若干管理工具是典型的用户进程，比如RMAN 、SQL*P
         <h3 id="Oracle-进程详解"><a href="#Oracle-进程详解" class="headerlink" title="Oracle 进程详解"></a>Oracle 进程详解</h3><p>参与数据库活动的进程可以分成两大类，分别是用户进程和 Oracle 进程，而后者又可以分成服 务进程（Server Process ）和后台进程（Background Process）。</p>
 <p><strong>1．用户进程</strong></p>
 <p>Oracle 提供的若干管理工具是典型的用户进程，比如RMAN 、SQL*PLUS 、EXP 、IMP 、SQLLDR 等。当然也包括用户自己开发的各种应用程序，这些程序的特点是为用户提供了输入接口，用户可 以通过这些程序向Oracle 数据库发送指令。但是这些进程都不能直接操作数据库文件、不能访问 Oracle 实例的 SGA 内存空间。如果是客户自己开发的程序，还必须借助Oracle 提供的驱动库才能 工作。</p>
+<a id="more"></a>
 <p><strong>2．服务进程</strong></p>
 <p>用户进程因为种种原因不能直接操作数据库文件或者SGA 内存（可能是代码安全问题、或者 跨越网络无法直接操作）。因此用户进程必须借助于Oracle 本地进程完成操作。这类进程的作用就 是用户进程的代理，就像是用户进程的影子一样，所以也叫做影子进程。因为影子进程的代码是由 Oracle 开发的，所以Oracle 完全信任这些代码是安全的，因此这些进程可以直接操作数据文件和 SGA 内存。这些进程接受用户进程发送的指令，并完成相应的操作，并给用户进程返回结果。这类进程 和后台进程可以操作数据文件、共享Oracle 实例的 SGA 内存空间。</p>
 <p>我们可以用一个实例来区分下两种进程:</p>
