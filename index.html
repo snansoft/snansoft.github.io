@@ -239,6 +239,207 @@
             
               
                 
+                <a class="post-title-link" href="/2016/04/29/oracle-back-process/" itemprop="url">
+                  Oracle 后台进程详解
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-29T13:40:44+08:00" content="2016-04-29">
+              2016-04-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Oracle-DBA/" itemprop="url" rel="index">
+                    <span itemprop="name">Oracle DBA</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/29/oracle-back-process/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/29/oracle-back-process/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2016/04/29/oracle-back-process/" class="leancloud_visitors" data-flag-title="Oracle 后台进程详解">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h3 id="后台进程"><a href="#后台进程" class="headerlink" title="后台进程"></a>后台进程</h3><p>后台进程负责保证数据库的稳定工作，每当数据库启动时，这些后台进程会自动启动，并且持续整 个实例的生命周期，每个进程负责一个独特的任务，表2-4 是一些最重要的后台进程。</p>
+<table>
+<thead>
+<tr>
+<th>进     程</th>
+<th>缩     写</th>
+<th>描     述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Database Writer</td>
+<td>DBWn</td>
+<td>负责把脏数据写回磁盘</td>
+</tr>
+<tr>
+<td>Log Writer</td>
+<td>LGWR</td>
+<td>负责把日志数据写到联机日志文件</td>
+</tr>
+<tr>
+<td>Checkpoint</td>
+<td>CKPT</td>
+<td>负责检查点操作</td>
+</tr>
+<tr>
+<td>Process Monitor</td>
+<td>PMON</td>
+<td>负责维护用户进程</td>
+</tr>
+<tr>
+<td>System Monitor</td>
+<td>SMON</td>
+<td>负责实例恢复</td>
+</tr>
+<tr>
+<td>Archiver</td>
+<td>ARCn</td>
+<td>负责归档操作，生成归档日志</td>
+</tr>
+<tr>
+<td>Manageability Monitor</td>
+<td>MMON</td>
+<td>和AW R有关</td>
+</tr>
+<tr>
+<td>Manageability Monitor Light</td>
+<td>MMNL</td>
+<td>和AW R有关</td>
+</tr>
+<tr>
+<td>Memory Manager</td>
+<td>MMAN</td>
+<td>和自动SGA管理有关</td>
+</tr>
+<tr>
+<td>Job Queue Coordination Process</td>
+<td>CJQO</td>
+<td>定时任务进程</td>
+</tr>
+<tr>
+<td>Recover Writer</td>
+<td>RVWR</td>
+<td>和Flashback Database 功能有关</td>
+</tr>
+<tr>
+<td>Change Tracking Writer</td>
+<td>CTWR</td>
+<td>跟踪数据块变化，支持快速增量备份</td>
+</tr>
+</tbody>
+</table>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/04/29/oracle-back-process/" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+    
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/04/29/oracle-process/" itemprop="url">
                   Oracle 进程详解
                 </a>
@@ -1081,7 +1282,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-count">7</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
