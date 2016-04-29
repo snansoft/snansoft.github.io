@@ -64,7 +64,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Oracle 归档模式,Oracle 备份," />
+  <meta name="keywords" content="Oracle 进程," />
 
 
 
@@ -80,16 +80,22 @@
 
 
 
-<meta name="description" content="归档模式和非归档模式在DBA部署数据库之初，必须要做出的最重要决定之一就是选择归档模式（ARCHIVELOG）或者非 归档模式（NOARCHIVELOG ）下运行数据库。我们知道，Oracle 数据库需要至少两组联机日志，每当一组 联机日志写满后会发生日志切换，继续向下一组联机日志写入。如果是归档模式，日志切换会触发归档进程 （ARCn）进行归档，生成归档日志。Oracle 保证归档完成前，联机日">
+<meta name="description" content="Oracle 进程详解参与数据库活动的进程可以分成两大类，分别是用户进程和 Oracle 进程，而后者又可以分成服 务进程（Server Process ）和后台进程（Background Process）。
+1．用户进程
+Oracle 提供的若干管理工具是典型的用户进程，比如RMAN 、SQL*PLUS 、EXP 、IMP 、SQLLDR 等。当然也包括用户自己开发的各种应用程序，这些程序的特点">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Oracle 归档模式和非归档模式">
-<meta property="og:url" content="http://blog.sunansheng.com/2016/04/29/archivelog-noarchivelog/index.html">
+<meta property="og:title" content="Oracle 进程详解">
+<meta property="og:url" content="http://blog.sunansheng.com/2016/04/29/oracle-process/index.html">
 <meta property="og:site_name" content="苏南生的博客">
-<meta property="og:description" content="归档模式和非归档模式在DBA部署数据库之初，必须要做出的最重要决定之一就是选择归档模式（ARCHIVELOG）或者非 归档模式（NOARCHIVELOG ）下运行数据库。我们知道，Oracle 数据库需要至少两组联机日志，每当一组 联机日志写满后会发生日志切换，继续向下一组联机日志写入。如果是归档模式，日志切换会触发归档进程 （ARCn）进行归档，生成归档日志。Oracle 保证归档完成前，联机日">
-<meta property="og:updated_time" content="2016-04-29T03:55:27.478Z">
+<meta property="og:description" content="Oracle 进程详解参与数据库活动的进程可以分成两大类，分别是用户进程和 Oracle 进程，而后者又可以分成服 务进程（Server Process ）和后台进程（Background Process）。
+1．用户进程
+Oracle 提供的若干管理工具是典型的用户进程，比如RMAN 、SQL*PLUS 、EXP 、IMP 、SQLLDR 等。当然也包括用户自己开发的各种应用程序，这些程序的特点">
+<meta property="og:updated_time" content="2016-04-29T05:36:24.009Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Oracle 归档模式和非归档模式">
-<meta name="twitter:description" content="归档模式和非归档模式在DBA部署数据库之初，必须要做出的最重要决定之一就是选择归档模式（ARCHIVELOG）或者非 归档模式（NOARCHIVELOG ）下运行数据库。我们知道，Oracle 数据库需要至少两组联机日志，每当一组 联机日志写满后会发生日志切换，继续向下一组联机日志写入。如果是归档模式，日志切换会触发归档进程 （ARCn）进行归档，生成归档日志。Oracle 保证归档完成前，联机日">
+<meta name="twitter:title" content="Oracle 进程详解">
+<meta name="twitter:description" content="Oracle 进程详解参与数据库活动的进程可以分成两大类，分别是用户进程和 Oracle 进程，而后者又可以分成服 务进程（Server Process ）和后台进程（Background Process）。
+1．用户进程
+Oracle 提供的若干管理工具是典型的用户进程，比如RMAN 、SQL*PLUS 、EXP 、IMP 、SQLLDR 等。当然也包括用户自己开发的各种应用程序，这些程序的特点">
 
 
 
@@ -107,7 +113,7 @@
   };
 </script>
 
-  <title> Oracle 归档模式和非归档模式 | 苏南生的博客 </title>
+  <title> Oracle 进程详解 | 苏南生的博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -237,7 +243,7 @@
             
             
               
-                Oracle 归档模式和非归档模式
+                Oracle 进程详解
               
             
           </h1>
@@ -249,7 +255,7 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-29T11:17:57+08:00" content="2016-04-29">
+            <time itemprop="dateCreated" datetime="2016-04-29T13:02:53+08:00" content="2016-04-29">
               2016-04-29
             </time>
           </span>
@@ -270,18 +276,6 @@
 
                 
                 
-                  ， 
-                
-
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Oracle-DBA/Oracle-备份/" itemprop="url" rel="index">
-                    <span itemprop="name">Oracle 备份</span>
-                  </a>
-                </span>
-
-                
-                
 
               
             </span>
@@ -291,8 +285,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/04/29/archivelog-noarchivelog/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/29/archivelog-noarchivelog/" itemprop="commentsCount"></span>
+                <a href="/2016/04/29/oracle-process/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/29/oracle-process/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -302,7 +296,7 @@
 
           
           
-             <span id="/2016/04/29/archivelog-noarchivelog/" class="leancloud_visitors" data-flag-title="Oracle 归档模式和非归档模式">
+             <span id="/2016/04/29/oracle-process/" class="leancloud_visitors" data-flag-title="Oracle 进程详解">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -323,51 +317,46 @@
       
 
       
-        <h3 id="归档模式和非归档模式"><a href="#归档模式和非归档模式" class="headerlink" title="归档模式和非归档模式"></a>归档模式和非归档模式</h3><p>在DBA部署数据库之初，必须要做出的最重要决定之一就是选择归档模式（ARCHIVELOG）或者非 归档模式（NOARCHIVELOG ）下运行数据库。我们知道，Oracle 数据库需要至少两组联机日志，每当一组 联机日志写满后会发生日志切换，继续向下一组联机日志写入。如果是归档模式，日志切换会触发归档进程 （ARCn）进行归档，生成归档日志。Oracle 保证归档完成前，联机日志不会被覆盖，如果是非归档模式， 则不会触发归档动作。 </p>
-<a id="more"></a>
-<h3 id="归档模式的优缺点"><a href="#归档模式的优缺点" class="headerlink" title="归档模式的优缺点"></a>归档模式的优缺点</h3><p>归档日志文件中保留了数据库的改动信息。</p>
-<p><strong>在这种模式下可以获得如下好处: </strong></p>
+        <h3 id="Oracle-进程详解"><a href="#Oracle-进程详解" class="headerlink" title="Oracle 进程详解"></a>Oracle 进程详解</h3><p>参与数据库活动的进程可以分成两大类，分别是用户进程和 Oracle 进程，而后者又可以分成服 务进程（Server Process ）和后台进程（Background Process）。</p>
+<p><strong>1．用户进程</strong></p>
+<p>Oracle 提供的若干管理工具是典型的用户进程，比如RMAN 、SQL*PLUS 、EXP 、IMP 、SQLLDR 等。当然也包括用户自己开发的各种应用程序，这些程序的特点是为用户提供了输入接口，用户可 以通过这些程序向Oracle 数据库发送指令。但是这些进程都不能直接操作数据库文件、不能访问 Oracle 实例的 SGA 内存空间。如果是客户自己开发的程序，还必须借助Oracle 提供的驱动库才能 工作。</p>
+<p><strong>2．服务进程</strong></p>
+<p>用户进程因为种种原因不能直接操作数据库文件或者SGA 内存（可能是代码安全问题、或者 跨越网络无法直接操作）。因此用户进程必须借助于Oracle 本地进程完成操作。这类进程的作用就 是用户进程的代理，就像是用户进程的影子一样，所以也叫做影子进程。因为影子进程的代码是由 Oracle 开发的，所以Oracle 完全信任这些代码是安全的，因此这些进程可以直接操作数据文件和 SGA 内存。这些进程接受用户进程发送的指令，并完成相应的操作，并给用户进程返回结果。这类进程 和后台进程可以操作数据文件、共享Oracle 实例的 SGA 内存空间。</p>
+<p>我们可以用一个实例来区分下两种进程:</p>
+<p>（1）首先用SQL*PLUS登录数据库，保持这个连接，也就是不要退出这个SQL*PLUS 会话环 境： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[oracle@testdb ~]$ sqlplus system/password</span><br></pre></td></tr></table></figure>
+<p>（2）在另一个窗口使用操作系统的 ps 命令来查看SQL*PLUS 对应的进程： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[oracle@ testdb ~]$ ps -ef|grep sqlplus </span><br><span class="line">oracle    13245  5924  0 14:43 pts/2    00:00:00 sqlplus</span><br></pre></td></tr></table></figure>
+<p>SQL*PLUS 这个客户进程的PID 是13245。 </p>
+<p>（3 ）回到SQL*PLUS 窗口，用下面语句查看对应的服务进程： </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select spid,username,terminal,program from v$process </span><br><span class="line">where addr in (select paddr from v$session where username='SYSTEM'); </span><br><span class="line"> </span><br><span class="line">SPID         USERNAME   TERMIN PROGRAM </span><br><span class="line">------------ ---------- ------ ---------------------------------------- </span><br><span class="line">13246        oracle     pts/2  oracle@shandongdbp (TNS V1-V3)</span><br></pre></td></tr></table></figure>
+<p>这个PID=13246 的进程就是为这个 PID=13245 的客户进程提供服务的服务进程。 </p>
+<p>（4 ）我们可以从 OS上查看这个进程： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[oracle@ testdb ~]$ ps -ef|grep 13246 </span><br><span class="line"> </span><br><span class="line">oracle   13246 13245  0 14:43 ?        00:00:00 oraclewxxrdb (DESCRIPTION=(LOCAL=YES) (ADDRESS=(PROTOCOL=beq)))</span><br></pre></td></tr></table></figure>
+<p>这是一个典型的服务进程，进程名字采用的是oracleSID这种格式。 服务进程可以直接操作数据库文件和SGA 进程，因此服务进程可以执行以下几种操作。 </p>
 <ul>
-<li>可以进行完全、不完全恢复：由于对数据库所做的全部改动都记录在日志文件中，如果发生硬盘故 障等导致数据文件丢失的话，则可以利用物理备份和归档日志完全恢复数据库，不会丢失任何数据。 </li>
-<li>可以进行联机热备：所谓联机热备，就是在数据库运行状态下，对数据库进行备份。备份时用户对 数据库的使用不受任何影响。 </li>
-<li>可以实施 Data Guard：可以部署 1 个或多个备用数据库，从而最大限度地提供灾难保护手段。 </li>
-<li>可以实施 Stream：利用 Stream 技术，可以实现最简单的单向复制到复杂的双向复制、多向复制， 提供更加灵活的数据冗余方案。 </li>
-<li>表空间可以脱机：可以备份部分数据库，比如重要的表空间。 </li>
-<li>能够增量备份：只需做一次完全备份，以后只备份发生改变的数据，可以提高备份速度。 </li>
-<li>更多的优化选项：随着 Oracle 版本升级，在联机热备方面不断有新的优化策略出现。</li>
+<li>逻辑读：一个服务进程从 Buffer Cache 中读取一个数据块的内容，就叫做逻辑读。 </li>
+<li>物理读：一个服务进程无法从 Buffer Cache 中得到它需要的数据时，就要通过物理读把数 据从数据文件中读到 Buffer Cache 中。 </li>
+<li>直接读 （Direct Read）：当服务进程通过并行操作（包括全表扫描、分区扫描、Fast Full Index Scan）方式读取数据时，可以采用直接读方式，这种操作读入的数据不经过 Buffer Cache， 而是直接读取到 PGA 中。 </li>
+<li>直接写（Direct Write）：在某些场合，服务进程可以把数据块内容直接写到数据文件中。 </li>
+<li>物理写（Physical Write） ：和物理读对应的写操作就是物理写，虽然物理写和服务进程没有 关系，不过为了帮助读者建立完整的知识体系，这里一并介绍下物理写。 </li>
 </ul>
-<p><strong>使用归档模式的缺点在于： </strong></p>
-<ul>
-<li>需要更多的磁盘空间保存归档日志； </li>
-<li>DBA 会有更多的管理工作，包括维护归档空间、备份归档日志。 </li>
-</ul>
-<h3 id="非归档模式的优缺点"><a href="#非归档模式的优缺点" class="headerlink" title="非归档模式的优缺点"></a>非归档模式的优缺点</h3><p>非归档模式不生成归档日志，从数据安全角度来说，这种模式缺点是主要的，而优点可以忽略不计。</p>
-<p><strong>非归档模式的缺点包括： </strong></p>
-<ul>
-<li>只能进行脱机备份，也就是所谓的“ 冷备份”，和联机备份的“ 热备份” 相对应，数据库必须完全 关闭后备份，在备份过程中数据库不可用； </li>
-<li>必须备份整个数据库，不能只备份部分数据库； </li>
-<li>不能增量备份，对于 TB 级数据库（VLDB） ，这是一个非常大的缺点； </li>
-<li>只能部分恢复，如果数据文件丢失需要恢复，DBA 只能恢复最后一次的完全备份，而之后的所有 数据库改变全部丢失。 </li>
-</ul>
-<p><strong>非归档模式的优点包括： </strong></p>
-<ul>
-<li>DBA 的管理工作减少，因为非归档模式不产生归档日志，因此 DBA 不用考虑对归档的管理； </li>
-<li>性能会有提升。 </li>
-</ul>
-<h3 id="非归档模式转换成归档模式"><a href="#非归档模式转换成归档模式" class="headerlink" title="非归档模式转换成归档模式"></a>非归档模式转换成归档模式</h3><p>数据库创建过程中需要指定归档和非归档模式，如果选择的是非归档模式，可以在数据库创建完成后 手工改变成归档模式，具体操作步骤如下。 </p>
-<p>（1 ）关闭数据库： </p>
-<pre><code>shutdown immediate; 
-</code></pre><p>（2 ）启动数据库到 mount 状态： </p>
-<pre><code>startup mount; 
-</code></pre><p>（3 ）修改数据库归档模式： </p>
-<pre><code>alter database archivelog; 
-</code></pre><p>（4 ）启动数据库： </p>
-<pre><code>alter database open; 
-</code></pre><p>（5 ）定义归档位置，也就是归档日志保存路径： </p>
-<pre><code>alter syste set log_archive_dest_1=&quot;location=d:\oradata\example\archive&quot; scope=both; 
-</code></pre><p>（6 ）确认配置生效： </p>
-<pre><code>archive log list; 
-</code></pre>
+<blockquote>
+<p>注意：常规的文件写操作是由DBWR进程完成的，而不是由服务进程完成的。 </p>
+</blockquote>
+<p><strong>3．后台进程 </strong></p>
+<p>后台进程是伴随着实例的启动而启动的，这些进程的功能是维护数据库系统的稳定运行，并不 直接对用户提供服务。每个后台进程都有一个专门的名称，提供专门的功能。有些后台进程是所有 数据库都需要的关键进程，而有些进程是根据数据库使用的功能不同才激活的可选进程。 </p>
+<p>查看后台进程的方法： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[oracle@testdb ~]$ ps -ef|grep oracle|grep -v oraclewxxrdb </span><br><span class="line"> </span><br><span class="line">oracle    5105     1  0 Oct29 ?        00:00:39 ora_pmon_wxxrdb </span><br><span class="line">oracle    5107     1  0 Oct29 ?        00:00:00 ora_psp0_wxxrdb </span><br><span class="line">oracle    5109     1  0 Oct29 ?        00:00:21 ora_mman_wxxrdb </span><br><span class="line">oracle    5111     1  0 Oct29 ?        00:12:08 ora_dbw0_wxxrdb </span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+<p>可以看到，每个后台进程的名称都不一样，但是都遵循ora_func_sid 这样一个格式。中间这 4 个字母就代表了这个进程的功能。 </p>
+<p><strong>4．三种进程的关系</strong></p>
+<p>可以用一个例子来描述这3 种进程的关系。我们去银行办理存款、取款业务都必须通过窗口进 行办理。窗口工作人员是经过专业培训的，银行相信他们的行为是安全的，而用户的行为是不安全 的。因此银行只允许其工作人员接触金库而不允许我们去接触金库。因此用户必须在窗口外活动， 由窗口工作人员完成客户的指令。 </p>
+<p>对应到Oracle 数据库，Oralce 认为客户进程是不安全的（客户进程不限于 Oracle 自己提供的工 具，还包括其他厂商的工具，包括你自己写的程序），因此客户程序不能直接操作数据库（包括数据 文件、SGA 内存），但是服务进程是 Oracle 自己写的，相当于经过培训的窗口工作人员，Oracle 认 为这些进程才是安全的，所以用户进程必须把指令交给服务进程，由服务进程完成真正的工作。银 行并不只有窗口工作人员，还有许多其他员工，这些员工各司其职才保证了整个银行正常运转。 Oracle 也同样还有许多后台进程，这些后台进程维护整个数据库的正常运行。 </p>
+<p>因此每当用户进程要访问数据库时，Oracle 分配一个服务进程给这个用户进程，用户进程和服 务进程进行通信，比如用户进程发送 SELECT 语句给服务进程，然后服务进程从数据文件中读取数 据，执行排序、过滤等操作，最终把结果返回给用户进程。 </p>
+<p>每当用户运行一个客户端应用，比如 SQL*PLUS 或者用户自己开发的应用程序，Oracle 就会创 建一个服务进程。这个进程会持续用户的整个生命周期。用户发出的每个SQL 语句，用户进程负责 进行语法检查、执行，从数据文件中把数据读入内存（如果数据还没有在SGA 中），最后把 SQL 结 果返回给用户。 </p>
+<p>根据服务进程的分配方式，Oracle 提供了两种方案：<strong>专有模式</strong>（Dedicated Mode）和<strong>共享模式</strong> （Shared Mode）。在专有模式下，用户进程和服务进程之间是 1 :1 的关系，而在共享模式下，用户的 请求通过转发器进程（Dispatcher）转给一个服务进程，多个用户共享使用预先创建的几个服务进程。 专有模式是最常用的方法，配置、调整都很简单，并且性能也是较好的。当然需要更多的资源，比 如内存。</p>
+<p>接下来我们讨论后台进程的组成和功能，见本博客的文章《Oracle 后台进程详解》。</p>
+
       
     </div>
     
@@ -387,9 +376,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Oracle-归档模式/" rel="tag">#Oracle 归档模式</a>
-          
-            <a href="/tags/Oracle-备份/" rel="tag">#Oracle 备份</a>
+            <a href="/tags/Oracle-进程/" rel="tag">#Oracle 进程</a>
           
         </div>
       
@@ -398,17 +385,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/04/29/oracle-backup-pre/" rel="next" title="Oracle 备份杂谈">
-                <i class="fa fa-chevron-left"></i> Oracle 备份杂谈
+              <a href="/2016/04/29/archivelog-noarchivelog/" rel="next" title="Oracle 归档模式和非归档模式">
+                <i class="fa fa-chevron-left"></i> Oracle 归档模式和非归档模式
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/04/29/oracle-process/" rel="prev" title="Oracle 进程详解">
-                Oracle 进程详解 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -434,8 +417,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/04/29/archivelog-noarchivelog/"
-           data-title="Oracle 归档模式和非归档模式" data-url="http://blog.sunansheng.com/2016/04/29/archivelog-noarchivelog/">
+      <div class="ds-thread" data-thread-key="2016/04/29/oracle-process/"
+           data-title="Oracle 进程详解" data-url="http://blog.sunansheng.com/2016/04/29/oracle-process/">
       </div>
     
   </div>
@@ -548,7 +531,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#归档模式和非归档模式"><span class="nav-number">1.</span> <span class="nav-text">归档模式和非归档模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#归档模式的优缺点"><span class="nav-number">2.</span> <span class="nav-text">归档模式的优缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非归档模式的优缺点"><span class="nav-number">3.</span> <span class="nav-text">非归档模式的优缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非归档模式转换成归档模式"><span class="nav-number">4.</span> <span class="nav-text">非归档模式转换成归档模式</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Oracle-进程详解"><span class="nav-number">1.</span> <span class="nav-text">Oracle 进程详解</span></a></li></ol></div>
             
           </div>
         </section>
