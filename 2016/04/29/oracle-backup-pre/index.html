@@ -64,7 +64,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Oracle 性能优化," />
+  <meta name="keywords" content="Oracle 备份," />
 
 
 
@@ -80,16 +80,19 @@
 
 
 
-<meta name="description" content="高资源消耗的 SQL与用户执行 SQL 有关的动态视图有 v$sql、v$sqlarea、v$sqltext、v$sql_plan、 v$sqlstats 等。v$sql 中包含了所有用户执行的所有 SQL 信息，不同用户、不同会 话执行相同 SQL 的语义、执行计划可能会不同，这些 SQL 字面值相同（具有相同 的 sql_id），通过不同的 child_number 来区分。v$sqlarea">
+<meta name="description" content="备份概述Oracle 的备份可以分成物理备份和逻辑备份，物理备份就是把实际物理文件从一处拷贝到另一处（可 能是1 ∶1 的原样拷贝，也可能是 n ∶1 的压缩拷贝），操作系统备份、使用 RMAN 的备份、冷备份、热备 份都是物理备份的例子。 
+逻辑备份是利用SQL 从数据库中提取数据，并将其保存到文件中，这些数据可以在以后需要时重新导 入到原有数据库，或者导入其他数据库。就逻辑备份的思想而言，用户">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Oracle 性能优化之高消耗的SQL">
-<meta property="og:url" content="http://blog.sunansheng.com/2016/04/22/oracle-vsql/index.html">
+<meta property="og:title" content="Oracle 备份杂谈">
+<meta property="og:url" content="http://blog.sunansheng.com/2016/04/29/oracle-backup-pre/index.html">
 <meta property="og:site_name" content="苏南生的博客">
-<meta property="og:description" content="高资源消耗的 SQL与用户执行 SQL 有关的动态视图有 v$sql、v$sqlarea、v$sqltext、v$sql_plan、 v$sqlstats 等。v$sql 中包含了所有用户执行的所有 SQL 信息，不同用户、不同会 话执行相同 SQL 的语义、执行计划可能会不同，这些 SQL 字面值相同（具有相同 的 sql_id），通过不同的 child_number 来区分。v$sqlarea">
-<meta property="og:updated_time" content="2016-04-22T07:21:34.874Z">
+<meta property="og:description" content="备份概述Oracle 的备份可以分成物理备份和逻辑备份，物理备份就是把实际物理文件从一处拷贝到另一处（可 能是1 ∶1 的原样拷贝，也可能是 n ∶1 的压缩拷贝），操作系统备份、使用 RMAN 的备份、冷备份、热备 份都是物理备份的例子。 
+逻辑备份是利用SQL 从数据库中提取数据，并将其保存到文件中，这些数据可以在以后需要时重新导 入到原有数据库，或者导入其他数据库。就逻辑备份的思想而言，用户">
+<meta property="og:updated_time" content="2016-04-29T02:43:36.464Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Oracle 性能优化之高消耗的SQL">
-<meta name="twitter:description" content="高资源消耗的 SQL与用户执行 SQL 有关的动态视图有 v$sql、v$sqlarea、v$sqltext、v$sql_plan、 v$sqlstats 等。v$sql 中包含了所有用户执行的所有 SQL 信息，不同用户、不同会 话执行相同 SQL 的语义、执行计划可能会不同，这些 SQL 字面值相同（具有相同 的 sql_id），通过不同的 child_number 来区分。v$sqlarea">
+<meta name="twitter:title" content="Oracle 备份杂谈">
+<meta name="twitter:description" content="备份概述Oracle 的备份可以分成物理备份和逻辑备份，物理备份就是把实际物理文件从一处拷贝到另一处（可 能是1 ∶1 的原样拷贝，也可能是 n ∶1 的压缩拷贝），操作系统备份、使用 RMAN 的备份、冷备份、热备 份都是物理备份的例子。 
+逻辑备份是利用SQL 从数据库中提取数据，并将其保存到文件中，这些数据可以在以后需要时重新导 入到原有数据库，或者导入其他数据库。就逻辑备份的思想而言，用户">
 
 
 
@@ -107,7 +110,7 @@
   };
 </script>
 
-  <title> Oracle 性能优化之高消耗的SQL | 苏南生的博客 </title>
+  <title> Oracle 备份杂谈 | 苏南生的博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -237,7 +240,7 @@
             
             
               
-                Oracle 性能优化之高消耗的SQL
+                Oracle 备份杂谈
               
             
           </h1>
@@ -249,8 +252,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-22T15:06:07+08:00" content="2016-04-22">
-              2016-04-22
+            <time itemprop="dateCreated" datetime="2016-04-29T09:43:29+08:00" content="2016-04-29">
+              2016-04-29
             </time>
           </span>
 
@@ -263,8 +266,20 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Oracle-性能优化/" itemprop="url" rel="index">
-                    <span itemprop="name">Oracle 性能优化</span>
+                  <a href="/categories/Oracle-DBA/" itemprop="url" rel="index">
+                    <span itemprop="name">Oracle DBA</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Oracle-DBA/Oracle-备份/" itemprop="url" rel="index">
+                    <span itemprop="name">Oracle 备份</span>
                   </a>
                 </span>
 
@@ -279,8 +294,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/04/22/oracle-vsql/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/22/oracle-vsql/" itemprop="commentsCount"></span>
+                <a href="/2016/04/29/oracle-backup-pre/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/29/oracle-backup-pre/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -290,7 +305,7 @@
 
           
           
-             <span id="/2016/04/22/oracle-vsql/" class="leancloud_visitors" data-flag-title="Oracle 性能优化之高消耗的SQL">
+             <span id="/2016/04/29/oracle-backup-pre/" class="leancloud_visitors" data-flag-title="Oracle 备份杂谈">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -311,51 +326,58 @@
       
 
       
-        <h2 id="高资源消耗的-SQL"><a href="#高资源消耗的-SQL" class="headerlink" title="高资源消耗的 SQL"></a>高资源消耗的 SQL</h2><p>与用户执行 SQL 有关的动态视图有 v$sql、v$sqlarea、v$sqltext、v$sql_plan、 v$sqlstats 等。v$sql 中包含了所有用户执行的所有 SQL 信息，不同用户、不同会 话执行相同 SQL 的语义、执行计划可能会不同，这些 SQL 字面值相同（具有相同 的 sql_id），通过不同的 child_number 来区分。v$sqlarea 中仅包含 SQL 语句的字面 信息，忽略了相同 SQL 语句在执行会话、语义、执行计划上的不同，相同的 SQL 语句在 v$sqlara 中仅以一行显示。v$sqltext 以多个 piece 的形式给出了 SQL 语句 的完整文本，它通过字段 address 和 hash_value 的联合可以唯一地标识一条 SQL 语句。v$sql_plan 包含了 SQL 语句的执行计划信息，它通过 address、hash_value、 child_number 三个字段（可以和 v$sql 关联）唯一地标识 SQL 语句的执行计划。 v$sqlstats 包含 SQL 语句的性能统计信息，通过 sql_id 和 plan_hash_value 可以唯一 地标识一条 SQL 语句的性能统计数据。v$sqlstats 视图的字段是 v$sql 和 v$sqlarea 字段的子集，即视图中的内容来自于它们，但 v$sqlstats 视图中的数据比 v$sql 和 v$sqlarea 保存更持久。</p>
+        <h2 id="备份概述"><a href="#备份概述" class="headerlink" title="备份概述"></a>备份概述</h2><p>Oracle 的备份可以分成物理备份和逻辑备份，物理备份就是把实际物理文件从一处拷贝到另一处（可 能是1 ∶1 的原样拷贝，也可能是 n ∶1 的压缩拷贝），操作系统备份、使用 RMAN 的备份、冷备份、热备 份都是物理备份的例子。 </p>
+<p>逻辑备份是利用SQL 从数据库中提取数据，并将其保存到文件中，这些数据可以在以后需要时重新导 入到原有数据库，或者导入其他数据库。就逻辑备份的思想而言，用户自己也可以开发一套逻辑备份工具， Oracle 也提供了 EXP 、IMP 、EXPDP、IMPDP工具，并随安装包发布。 </p>
 <a id="more"></a>
-<p>当我们需要根据各种资源消耗查找 top SQL 时，可以根据不同的性能统计字 段查询 v$sql，该视图不仅包含用户提交给数据库的 SQL 语句及其文本，而且还包含这些语句的性能统计数据。表 13.1 给出了资源消耗与 v$sql 视图相关字段的 说明。 </p>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">资 源 消 耗</th>
-<th>字段及其说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">执行代价 cost</td>
-<td>optimizer_cost 优化器给出的执行代价</td>
-</tr>
-<tr>
-<td style="text-align:center">CPU 消耗</td>
-<td>cpu_time、elapsed_time <br>每次执行的 CPU 耗时= cpu_time/executions<br>每次执行消耗的时间= elapsed_time/executions</td>
-</tr>
-<tr>
-<td style="text-align:center">I/O 消耗</td>
-<td>disk_reads <br>每次执行的磁盘读次数= disk_reads/executions</td>
-</tr>
-<tr>
-<td style="text-align:center">内存消耗</td>
-<td>buffer_gets、sharable_mem（消耗 shared pool）<br>每次执行的缓存消耗= buffer_gets/executions</td>
-</tr>
-<tr>
-<td style="text-align:center">语句解析消耗</td>
-<td>parse_calls 该语句（硬）解析的次数</td>
-</tr>
-<tr>
-<td style="text-align:center">排序消耗</td>
-<td>sorts</td>
-</tr>
-<tr>
-<td style="text-align:center">检索记录数</td>
-<td>rows_processed、fetches</td>
-</tr>
-</tbody>
-</table>
-<h2 id="top-SQL-查询示例"><a href="#top-SQL-查询示例" class="headerlink" title="top SQL 查询示例"></a>top SQL 查询示例</h2><p>（1）查询最消耗 CPU 时间的前 10 个 SQL 语句。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; SELECT *</span><br><span class="line">  2    FROM (SELECT sql_id,</span><br><span class="line">  3                 child_number</span><br><span class="line">  4            FROM v$sql</span><br><span class="line">  5           ORDER BY cpu_time DESC)</span><br><span class="line">  6   WHERE rownum &lt;= 10;</span><br><span class="line">SQL_ID        CHILD_NUMBER</span><br><span class="line">------------- ------------</span><br><span class="line">f5mkwycvxw09f            0</span><br><span class="line">d0knq1hqbsunv            0</span><br><span class="line">5khbzgpncr2an            0</span><br><span class="line">0v9u9pcwk93xq            0</span><br><span class="line">65p9vk5a6khar            0</span><br><span class="line">a1vukjd565f1p            0</span><br><span class="line">9ur5wdahzm0r8            0</span><br><span class="line">7ht68a765a5wk            0</span><br><span class="line">g1ppkt6aam9q8            0</span><br><span class="line">5zruc4v6y32f9            0</span><br><span class="line">10 rows selected</span><br></pre></td></tr></table></figure></p>
-<p>（2）查询消耗磁盘读次数最多的 10 个 SQL 语句。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; SELECT *</span><br><span class="line">  2    FROM (SELECT sql_id,</span><br><span class="line">  3                 child_number,</span><br><span class="line">  4                 round(disk_reads / executions) dsk_rds</span><br><span class="line">  5            FROM v$sql</span><br><span class="line">  6           WHERE executions &gt; 0</span><br><span class="line">  7           ORDER BY dsk_rds DESC)</span><br><span class="line">  8   WHERE rownum &lt;= 10;</span><br><span class="line">SQL_ID        CHILD_NUMBER    DSK_RDS</span><br><span class="line">------------- ------------ ----------</span><br><span class="line">3trrg5vyyp34v            0     503659</span><br><span class="line">6mcpb06rctk0x            0     357586</span><br><span class="line">9t76mbbnfd6qx            0     313762</span><br><span class="line">2zsg19udkb16g            0     275046</span><br><span class="line">gbmz0s1k7c0hd            1     221525</span><br><span class="line">5zruc4v6y32f9            0     167840</span><br><span class="line">3mh20bujr6cd0            0     147844</span><br><span class="line">b1wtt4gzadtqs            0      98749</span><br><span class="line">0f0unwp9ypug8            0      98747</span><br><span class="line">05s9358mm6vrr            0      87929</span><br><span class="line">10 rows selected</span><br></pre></td></tr></table></figure></p>
-<p>另外，ORACLE 提供了一个视图 v$session_longops，记录了所有超过 6 秒的 会话操作，如执行备份与恢复操作、统计信息的收集等，包括执行超过 6 秒的 SQL 语句（需要设置 timed_statistics 为 true 并需要统计信息的支持）。可以通过该视图 获得响应时间较长的 SQL 语句信息，通过字段 sql_address 和 sql_hash_value 与视 图 v$sql（或 v$sqltxt）联接可以获得完整的 SQL 语句的文本。 </p>
-<p>本文地址：<a href="http://blog.sunansheng.com/2016/04/22/oracle-vsql/">http://blog.sunansheng.com/2016/04/22/oracle-vsql/</a></p>
+<h2 id="物理备份"><a href="#物理备份" class="headerlink" title="物理备份"></a>物理备份</h2><p>所谓物理备份，就是通过对数据文件的拷贝生成备份文件的方式。原始文件和备份文件可以是1 对1 的关系，也可以是 N 对1 的方式。联机热备和冷备份都属于物理备份，这一部分重点介绍联机热备。联机 热备根据使用的工具不同，又可以分成<strong>用户管理备份</strong>（User-Managed Backup）和<strong>恢复管理器备份</strong>（也就是 RMAN 备份，Recover Manager）。前者是借助操作系统的文件拷贝命令（比如 cp ）来完成，而后者是利用 Oracle 提供的工具 RMAN 进行备份。 </p>
+<h3 id="冷备份"><a href="#冷备份" class="headerlink" title="冷备份"></a>冷备份</h3><p>所谓冷备份，就是正常关闭数据库后进行的备份。也叫做脱机（Offline ）备份。进行这种类型的备份 最简单，但是也最不可取，因为关闭数据库就意味着关闭业务系统，也就是停止了一切商务活动。这种备 份包括以下3 个步骤。 </p>
+<p><strong>（1）关闭数据库。 </strong></p>
+<p>要进行冷备份，首先必须正常关闭数据库，也就是通过SHUTDOWN NORMAL 、IMMEDIATE 、 TRANSACTION方式关闭，而不能 SHUTDOWN ABORT方式。因为只有正常方式关闭的数据库，数据库 才会处在一致性状态。 </p>
+<p><strong>（2）备份所需的 Oracle 文件。 </strong></p>
+<p>需要备份的文件包括控制文件、数据文件、日志文件，而参数文件、密码文件、代码文件根据需要进 行可选的备份。 </p>
+<p><strong>（3）以正常方式启动数据库。 </strong></p>
+<p>如果数据库处于非归档模式，则只能使用“冷备份”一种备份方式。 </p>
+<h3 id="热备份"><a href="#热备份" class="headerlink" title="热备份"></a>热备份</h3><p>如果数据库运行在归档模式下，Oracle 就允许在数据库运行的同时进行备份操作，无须关闭数据库， 也不会干扰用户对数据库的使用。和非归档模式的“冷备份”相对，这种备份就叫做“热备份”。同样和“脱 机备份”相对，也叫做“联机备份”。  </p>
+<p>Oracle 的“热备份”根据工具不同分成了两种，User-Managed Backup和RMAN Backup，下面分别介 绍这两种工具。 </p>
+<p><strong>1．User-Managed Backup </strong></p>
+<p>对于这种备份方法本书只做简单介绍，不重点论述，读者只需做概念上了解即可，而应把更多的精力 放在后面的RMAN 上。这种备份方式是借助SQL 命令和操作系统的文件拷贝命令完成的，具体操作步骤分为3 步： </p>
+<ul>
+<li><strong>使用 SQL 的 ALTER TABLESPACE … BEGIN BACKUP 命令把表空间置为备份模式； </strong></li>
+<li><strong>使用操作系统文件拷贝命令进行文件拷贝； </strong></li>
+<li><strong>拷贝结束后，使用 SQL 的 ALTER TABLESPACE…END BACKUP 结束备份。 </strong></li>
+</ul>
+<p>下面通过一个例子解释这些步骤：</p>
+<p>(1)把要备份的表空间置为备份模式：</p>
+<pre><code>alter tablespace test begin backup; 
+</code></pre><p>（2 ）操作系统的文件拷贝： </p>
+<pre><code>cp test1.dbf /backup/test1.dbf 
+</code></pre><p>（3 ）拷贝完成后，结束备份： </p>
+<pre><code>alter tablespace test end backup; 
+</code></pre><p>对于这种备份方式，有以下3 个重点需要掌握。 </p>
+<p><strong>2．ALTER…BEGIN BACKUP 命令 </strong></p>
+<p>ALTER…BEGIN BACKUP 命令会有两个效果，首先会触发表空间上的检查点操作，强迫数据文件在 备份开始时处于一致性状态；然后数据文件头的SCN 就会被冻结，在结束备份前（也就是发出 ALTER…END BACKUP 命令）这个SCN 都不会改变。 </p>
+<p>这样做的原因是：把表空间置为备份模式并不会阻止后续对数据文件内容的修改，也就是说在备份过 程中，DBWR 进程仍然能向数据文件中写入数据。而操作系统的cp 命令不会感知这些变化。其结果就是在开始备份时数据文件处于一致性状态，但是在备份结束后，数据文件就处于不一致状态了，进而导致备 份文件也是不一致状态。通过冻结SCN ，Oracle 在恢复时就可以知道备份文件在这个SCN 对应的时点， 数据是一致的。恢复工作只需从这个SCN 开始就可以了。 </p>
+<p><strong>3．备份期间数据库异常中止 </strong></p>
+<p>如果使用User-Managed Backup 方式进行备份，需要注意一个问题。就是备份过程中发生了数据库异 常中止。这种异常会有两个影响。 </p>
+<ul>
+<li><strong>如果操作系统文件拷贝没有完成，则备份文件不可用，需要重新备份。这个影响相对于下一个影响 还小一些。  </strong></li>
+<li><strong>数据文件会被认为是从备份中恢复出来的，再次打开数据库时会提示“ 数据文件需要恢复”，这个 影响需要 DBA 小心处理。下面介绍这个问题的成因及解决办法。 </strong></li>
+</ul>
+<p>之所以会遇到这种提示，是因为数据文件头的SCN 被冻结了。其原因已经在前面解释过了。也正因 为SCN 被冻结，导致文件头的SCN 和数据库控制文件中的SCN 不一致，肯定会小于后一个SCN 。Oracle 在打开数据库时会比较这些SCN ，只有完全一致，才能够打开数据库。因此，Oracle 会认为这个数据文 件是从备份中恢复出来的，提示“数据文件需要恢复”。 </p>
+<p>对于DBA来说，如果你无法确定数据文件是不是从备份文件中恢复过来的，那么首先就要进行一个判 断：是否因为文件处于备份模式才导致了这个提示，这一点可以从视图中查看。 </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">file</span>#,<span class="keyword">status</span>,<span class="keyword">change</span>#,<span class="keyword">time</span> <span class="keyword">from</span> v$<span class="keyword">backup</span>;</span><br></pre></td></tr></table></figure>
+<p>如果是处于备份模式的数据文件，STATUS 列示ACTIVE，同时 CHANGE# 、TIME 列也会有相应的数 据值。 如果是正常模式的数据文件，STATUS 列是NOT ACTIVE ，同时CHANGE# 、TIME 列是 0 和空。 从另外一个视图也可以看到数据文件头SCN 被冻结的信息： </p>
+<pre><code>select name,status,fuzzy from v$datafile_header; 
+</code></pre><p>如果是处于备份模式的数据文件，FUZZY列是YES ，否则是空值。 一旦确定是因为备份模式导致的这个错误，可以使用结束备份命令来解除这个冻结。 然后就可以打开数据库了。 </p>
+<pre><code>alter database datafile 2 end backup; 
+或者： 
+alter database end backup; 
+</code></pre><p><strong>4．REDO 数量 </strong></p>
+<p>使用这种备份比RMAN 备份会生成更多的Redo日志。 Oracle 的数据块和 OS的数据块不是1 ∶1 的关系，而是 1 ∶n 的关系。比如通常操作系统的数据块是  512 字节，而 Oracle 数据块通常是 8KB ，也就是说二者是 16∶1 的关系。操作系统的文件拷贝命令是在操 作系统级别进行的，也就是对OS Block 进行拷贝，ALTER …BEGIN BACKUP 命令不会禁止DBWR 进程 写入数据文件，也不会锁定数据文件，因此在操作系统拷贝的同时，DBWR 进程还是有可能把数据块写入 磁盘。</p>
+<p>因为DBWR 进程和cp 命令处理的数据块大小不同，就可能出现下面这种情况：cp 命令把一个Oracle 数据块的头4KB 读入，正在向备份文件中写入。这时，DBWR 进程修改了 Oracle 数据块的内容，当然会 修改数据块头内容。然后cp 命令又把后4KB 内容读出，写到备份文件中。这时，备份文件中的这个数据 块就处于一种不一致的状态，这就是所谓数据块分裂（Split Block ）。对于这种数据块，Oracle 在恢复中会 认为是损坏的数据块（Currpted Block）。</p>
+<p>为了解决数据块分裂这个问题，对于User-Managed Backup 这种备份方式，Oracle 会使用一个特殊的 机制，也就是一旦数据文件处于备份模式，则在对数据块作修改时，Oracle 会把数据块的前镜像完整的记 录到联机日志中，这样以后的恢复中，就可以借助数据块的前镜像解决分裂问题，而非备份模式下联机日 志中只会记录被修改的记录的前镜像，这也是为什么采用User-Managed Backup会产生更多 Redo的原因。</p>
+<p>但是如果通过RMAN 工具进行热备，RMAN 会先把Oracle 数据块读入一个缓存区，从工具级别就避 免了数据块分裂的问题。 </p>
+<p>RMAN备份下一文章讲解</p>
 
       
     </div>
@@ -376,7 +398,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Oracle-性能优化/" rel="tag">#Oracle 性能优化</a>
+            <a href="/tags/Oracle-备份/" rel="tag">#Oracle 备份</a>
           
         </div>
       
@@ -385,17 +407,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/04/22/oracle-sql-performance-pre/" rel="next" title="Oracle数据库性能杂谈">
-                <i class="fa fa-chevron-left"></i> Oracle数据库性能杂谈
+              <a href="/2016/04/22/oracle-vsql/" rel="next" title="Oracle 性能优化之高消耗的SQL">
+                <i class="fa fa-chevron-left"></i> Oracle 性能优化之高消耗的SQL
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/04/29/oracle-backup-pre/" rel="prev" title="Oracle 备份杂谈">
-                Oracle 备份杂谈 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -421,8 +439,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/04/22/oracle-vsql/"
-           data-title="Oracle 性能优化之高消耗的SQL" data-url="http://blog.sunansheng.com/2016/04/22/oracle-vsql/">
+      <div class="ds-thread" data-thread-key="2016/04/29/oracle-backup-pre/"
+           data-title="Oracle 备份杂谈" data-url="http://blog.sunansheng.com/2016/04/29/oracle-backup-pre/">
       </div>
     
   </div>
@@ -535,7 +553,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#高资源消耗的-SQL"><span class="nav-number">1.</span> <span class="nav-text">高资源消耗的 SQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#top-SQL-查询示例"><span class="nav-number">2.</span> <span class="nav-text">top SQL 查询示例</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#备份概述"><span class="nav-number">1.</span> <span class="nav-text">备份概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#物理备份"><span class="nav-number">2.</span> <span class="nav-text">物理备份</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#冷备份"><span class="nav-number">2.1.</span> <span class="nav-text">冷备份</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#热备份"><span class="nav-number">2.2.</span> <span class="nav-text">热备份</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
