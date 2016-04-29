@@ -83,15 +83,15 @@
 <meta name="description" content="内存结构现代计算机中，CPU 对内存的访问速度要比从磁盘的速度快千倍，因此 Oracle 对于数据的访问 也尽量都在内存中完成，而不是直接修改硬盘上的数据。内存内容在合适的时候再同步到磁盘。 Oracle 利用内存来克服磁盘 IO的束缚，在内存中进行活动越多，系统性能越好，反之，在磁盘上进 行的操作越多，系统性能越差。 
 Oracle 是一个内存消耗大户，它消耗的内存可以分成两部分——进程共享部分">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Oracle 内存结构详解">
+<meta property="og:title" content="【精】Oracle 内存结构详解">
 <meta property="og:url" content="http://blog.sunansheng.com/2016/04/29/oracle-memory/index.html">
 <meta property="og:site_name" content="苏南生的博客">
 <meta property="og:description" content="内存结构现代计算机中，CPU 对内存的访问速度要比从磁盘的速度快千倍，因此 Oracle 对于数据的访问 也尽量都在内存中完成，而不是直接修改硬盘上的数据。内存内容在合适的时候再同步到磁盘。 Oracle 利用内存来克服磁盘 IO的束缚，在内存中进行活动越多，系统性能越好，反之，在磁盘上进 行的操作越多，系统性能越差。 
 Oracle 是一个内存消耗大户，它消耗的内存可以分成两部分——进程共享部分">
 <meta property="og:image" content="http://img.blog.csdn.net/20160429144237515">
-<meta property="og:updated_time" content="2016-04-29T07:31:27.319Z">
+<meta property="og:updated_time" content="2016-04-29T07:38:08.030Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Oracle 内存结构详解">
+<meta name="twitter:title" content="【精】Oracle 内存结构详解">
 <meta name="twitter:description" content="内存结构现代计算机中，CPU 对内存的访问速度要比从磁盘的速度快千倍，因此 Oracle 对于数据的访问 也尽量都在内存中完成，而不是直接修改硬盘上的数据。内存内容在合适的时候再同步到磁盘。 Oracle 利用内存来克服磁盘 IO的束缚，在内存中进行活动越多，系统性能越好，反之，在磁盘上进 行的操作越多，系统性能越差。 
 Oracle 是一个内存消耗大户，它消耗的内存可以分成两部分——进程共享部分">
 <meta name="twitter:image" content="http://img.blog.csdn.net/20160429144237515">
@@ -112,7 +112,7 @@ Oracle 是一个内存消耗大户，它消耗的内存可以分成两部分—�
   };
 </script>
 
-  <title> Oracle 内存结构详解 | 苏南生的博客 </title>
+  <title> 【精】Oracle 内存结构详解 | 苏南生的博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -242,7 +242,7 @@ Oracle 是一个内存消耗大户，它消耗的内存可以分成两部分—�
             
             
               
-                Oracle 内存结构详解
+                【精】Oracle 内存结构详解
               
             
           </h1>
@@ -307,7 +307,7 @@ Oracle 是一个内存消耗大户，它消耗的内存可以分成两部分—�
 
           
           
-             <span id="/2016/04/29/oracle-memory/" class="leancloud_visitors" data-flag-title="Oracle 内存结构详解">
+             <span id="/2016/04/29/oracle-memory/" class="leancloud_visitors" data-flag-title="【精】Oracle 内存结构详解">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -331,6 +331,7 @@ Oracle 是一个内存消耗大户，它消耗的内存可以分成两部分—�
         <h3 id="内存结构"><a href="#内存结构" class="headerlink" title="内存结构"></a>内存结构</h3><p>现代计算机中，CPU 对内存的访问速度要比从磁盘的速度快千倍，因此 Oracle 对于数据的访问 也尽量都在内存中完成，而不是直接修改硬盘上的数据。内存内容在合适的时候再同步到磁盘。 Oracle 利用内存来克服磁盘 IO的束缚，在内存中进行活动越多，系统性能越好，反之，在磁盘上进 行的操作越多，系统性能越差。 </p>
 <p>Oracle 是一个内存消耗大户，它消耗的内存可以分成两部分——<strong>进程共享部分</strong>和<strong>进程专有部分</strong>。 这里的进程专指Oracle 进程（Server Process 和Background Process），进程共享部分就叫做<strong> SGA </strong>（Shared Global Area ），进程专有部分就叫做 <strong>PGA </strong>（Program Global Area）。 </p>
 <p>对于不同类型的应用系统，这两个部分的意义也不同。对于OLTP系统，其特征大量的小事务， SGA 要比PGA更为重要。对于OLAP 系统来说，其特征是大数据量的关联，因此PGA 要比SGA 对系统的影响更大。因为PGA 直接决定了大的排序、哈希操作效率。 </p>
+<a id="more"></a>
 <h3 id="1．SGA"><a href="#1．SGA" class="headerlink" title="1．SGA"></a>1．SGA</h3><p>SGA 是一大块内存的总称，其内部分成若干组成部分，下图是一个典型的 SGA 示意图，每 个部分都有独特的作用。<br><img src="http://img.blog.csdn.net/20160429144237515" alt=""></p>
 <h3 id="2．Data-Buffer-Cache"><a href="#2．Data-Buffer-Cache" class="headerlink" title="2．Data Buffer Cache"></a>2．Data Buffer Cache</h3><p>由Server Process 从磁盘读入的数据就放在这块内存中。而修改数据时，也是在这个区域中对数 据进行修改。Data Buffer Cache 中会同时保留数据库被修改前（Before Image，前镜像）和被修改后 （After Image ，后镜像）的拷贝。 </p>
 <p>Data Buffer Cache 中的内存可以被分成 3 类:</p>
@@ -462,7 +463,7 @@ Oracle 是一个内存消耗大户，它消耗的内存可以分成两部分—�
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2016/04/29/oracle-memory/"
-           data-title="Oracle 内存结构详解" data-url="http://blog.sunansheng.com/2016/04/29/oracle-memory/">
+           data-title="【精】Oracle 内存结构详解" data-url="http://blog.sunansheng.com/2016/04/29/oracle-memory/">
       </div>
     
   </div>
